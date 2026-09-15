@@ -99,6 +99,20 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect, isA
           ))}
         </div>
       </div>
+
+      <footer style={{
+        marginTop: 36, paddingTop: 20, borderTop: '1px solid var(--border)',
+        textAlign: 'center',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 10 }}>
+          <a href="/terms.html" style={{ fontSize: 12, color: 'var(--ink-dim)' }}>Terms of Service</a>
+          <a href="/privacy.html" style={{ fontSize: 12, color: 'var(--ink-dim)' }}>Privacy Policy</a>
+          <a href="/refunds.html" style={{ fontSize: 12, color: 'var(--ink-dim)' }}>Refund Policy</a>
+        </div>
+        <p style={{ fontSize: 11, color: 'var(--ink-dim)', margin: 0 }}>
+          © {new Date().getFullYear()} Wovenfate
+        </p>
+      </footer>
     </div>
   );
 }

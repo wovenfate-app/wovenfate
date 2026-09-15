@@ -725,6 +725,89 @@ your credit. Complete that purchase and confirm in Stripe's dashboard
 (test mode) that the actual charge matches the discounted amount shown,
 not a flat £10.00.
 
+### Legal pages: Terms, Privacy, Refund Policy (this session)
+
+Three documents drafted, reflecting how the app actually works (not
+generic boilerplate) — bundle pricing, passwordless auth, Stripe/
+Supabase/Vercel as named processors, the fade-to-black content's 18+
+framing, and a no-refund-once-unlocked stance with the UK Consumer
+Contracts Regulations exception it relies on spelled out plainly.
+
+**Source markdown lives in `legal-drafts/`** (not shipped publicly —
+reference/editing copies). **Live pages are in `public/`**:
+`terms.html`, `privacy.html`, `refunds.html` — styled to match the
+app's actual brand rather than a plain text dump, linked from a new
+footer on the landing page.
+
+**Before these go live for real, not just test mode, four things need
+filling in** (search each file for bracketed placeholders):
+1. `[BUSINESS NAME]` — your actual trading name/entity, in all three
+2. `[DATE]` — the date you actually publish these
+3. Company registration details in Terms §1, if/once incorporated
+4. Confirm `support@wovenfate.app` is a real, monitored inbox before
+   launch — right now it's a placeholder until the custom SMTP/domain
+   email setup happens
+
+**Also flagged, deliberately, at the top of each document:** these are
+AI-assisted drafts, not reviewed by a solicitor. They're built to
+actually reflect the product accurately rather than being generic
+filler — but real legal review is worth doing before you're processing
+real payments at volume, not after.
+
+**To verify:** `npm run dev`, scroll to the bottom of the landing page,
+confirm the three footer links work and the pages render correctly
+styled (dark theme, matching fonts) rather than plain unstyled text.
+
+### Native wrapper groundwork (this session)
+
+**Honest split of labor on this one:** actually scaffolding the native
+iOS/Android projects needs real network access (fetching Capacitor's
+platform templates from npm) and, for iOS specifically, an actual Mac
+or cloud Mac build service — neither of which this sandbox has. So
+this session prepared everything that *can* be done without that,
+to make the remaining steps as close to one-command as possible.
+
+**Done here:**
+- `capacitor.config.ts` — app ID (`com.wovenfate.app` —
+  **confirm this before your first real build**, it can't be changed
+  after App Store submission without becoming a new app), app name,
+  matches the web build output folder, background color set to avoid
+  a white flash on launch
+- Capacitor dependencies added to `package.json`
+- `resources/icon.png` (1024×1024, fully opaque — required for App
+  Store) and `resources/splash.png` (2732×2732), both on-brand,
+  ready for `@capacitor/assets` to auto-generate every required
+  iOS/Android size from
+- `codemagic.yaml` — a starter CI config for free-tier cloud iOS
+  builds. **This genuinely could not be tested in this sandbox** —
+  treat it as a solid template to refine once you've connected the
+  repo to Codemagic, not a guaranteed first-try success. The parts
+  needing your actual Apple Developer credentials are clearly marked
+  and can't be filled in here since they're private to your account.
+
+**What you'll actually run, in order, once this update is applied:**
+
+```
+npm install
+npx cap add ios
+npx cap add android
+npx capacitor-assets generate
+npx cap sync
+```
+
+Then:
+1. Push to GitHub (as usual)
+2. Sign up at codemagic.io, connect this repo
+3. Codemagic UI → Teams → Environment variables → create the
+   `app_store_credentials` group referenced in `codemagic.yaml`, add
+   your App Store Connect API credentials there
+4. Trigger a build — expect to iterate on `codemagic.yaml` a bit on
+   the first attempt, since CI configs commonly need small adjustments
+   once they meet a real project for the first time
+
+**Android** can be built entirely locally via Android Studio (free,
+runs fine on Windows) — no cloud service needed for that half.
+
 ### Deploy to Vercel
 
 1. Push this project to a GitHub repo.

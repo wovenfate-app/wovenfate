@@ -1,0 +1,70 @@
+workflows:
+  ios-workflow:
+    name: Wovenfate iOS
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      node: 20
+      xcode: latest
+      cocoapods: default
+      # Create this group in Codemagic's UI (Teams → Environment variables)
+      # and add: APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER,
+      # APP_STORE_CONNECT_PRIVATE_KEY (from App Store Connect → Users and
+      # Access → Keys) — these can't be filled in here since they're your
+      # private credentials, not something to commit to the repo.
+      groups:
+        - app_store_credentials
+      vars:
+        BUNDLE_ID: "com.wovenfate.app" # must match capacitor.config.ts
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: $BUNDLE_ID
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+
+    scripts:
+      - name: Install dependencies
+        script: npm install
+
+      - name: Build web app
+        script: npm run build
+
+      - name: Add iOS platform (first run only — safe to leave in, it's a no-op once ios/ exists)
+        script: |
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+
+      - name: Sync web build into native project
+        script: npx cap sync ios
+
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios/App && pod install
+
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+
+      - name: Build .ipa
+        script: |
+          xcode-project build-ipa \
+            --workspace "ios/App/App.xcworkspace" \
+            --scheme "App"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      # Uploads to TestFlight automatically on a successful build. Comment
+      # this out if you'd rather download the .ipa and upload manually
+      # the first few times, to get comfortable with the process.
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
