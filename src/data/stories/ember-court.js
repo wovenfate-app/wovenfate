@@ -46,8 +46,8 @@ You look down. The letter doesn't burn easily. The edges are curling in your han
 
 You are out of time. He knows where you are.`,
       choices: [
-        { label: "Refuse the summons — let him come to you", next: "n2a" },
-        { label: "Answer the call — go to him", next: "n2b" }
+        { label: "Refuse the summons — Let the wards fail. Force him to cross the threshold and face you on your own ground.", next: "n2a" },
+        { label: "Answer the call — Pack your blades. Step back into the dark water and face the debt before he comes to collect it.", next: "n2b" }
       ]
     },
 
@@ -83,8 +83,8 @@ He steps inside, bringing the scent of ozone, rain, and ancient, deep-water magi
 
 You feel the old anger rise inside you, familiar and comforting as a scar you keep forgetting to stop touching. But underneath that anger — inconveniently, infuriatingly — something else stirs too. A tiny, stubborn ember that apparently never went out, no matter how thoroughly you told yourself you had smothered it in the ash of your departure.`,
       choices: [
-        { label: "Let him explain the binding", next: "n3" },
-        { label: "Ask what he's not telling you", next: "n3_pressed" }
+        { label: "Let him explain the binding — Listen to how the magic works. Understand the trap you are both caught in.", next: "n3" },
+        { label: "Ask what he's not telling you — Press him on his vulnerability. Demand to know why a king is suddenly begging a hunter for help.", next: "n3_pressed" }
       ]
     },
 
@@ -108,8 +108,8 @@ Something that might be relief, might be grief, moves behind his eyes. "Then let
 
 He doesn't reach for you. He turns, and you follow him down into the ritual chamber, the ancient salt-and-ozone air of the lower court closing around you both like a held breath refusing to let go.`,
       choices: [
-        { label: "Let him explain the binding", next: "n3" },
-        { label: "Ask what he's not telling you", next: "n3_pressed" }
+        { label: "Let him explain the binding — Listen to how the magic works. Understand the trap you are both caught in.", next: "n3" },
+        { label: "Ask what he's not telling you — Press him on his vulnerability. Demand to know why a king is suddenly begging a hunter for help.", next: "n3_pressed" }
       ]
     },
 
@@ -143,8 +143,8 @@ But it doesn't feel done. It feels like the exact opposite of done. It feels lik
 
 The blood between your palms is warm. His thumb moves once, absently, a soft and heartbreaking stroke over the back of your hand. Neither of you lets go.`,
       choices: [
-        { label: "Guard yourself — pull back before this goes further", next: "n4a" },
-        { label: "Lower your guard — let the moment happen", next: "n4b" }
+        { label: "Guard yourself — Pull your hand back. Rebuild the walls around your heart before this goes any further.", next: "n4a" },
+        { label: "Lower your guard — Stay exactly where you are. Let the moment happen and see what is left between you.", next: "n4b" }
       ]
     },
 
@@ -176,8 +176,8 @@ It doesn't feel done. It feels like the opposite of done — like an iron door l
 
 His thumb moves once, absently, over the back of your hand. Neither of you lets go.`,
       choices: [
-        { label: "Guard yourself — pull back before this goes further", next: "n4a" },
-        { label: "Lower your guard — let the moment happen", next: "n4b" }
+        { label: "Guard yourself — Pull your hand back. Rebuild the walls around your heart before this goes any further.", next: "n4a" },
+        { label: "Lower your guard — Stay exactly where you are. Let the moment happen and see what is left between you.", next: "n4b" }
       ]
     },
 
@@ -200,8 +200,8 @@ You follow him deeper into the drowned halls, past archways slick with black wat
 
 He doesn't try to close the distance again. He walks a full pace ahead of you, spine straight, crown crooked, every inch the ruler he's supposed to be. You almost wish, infuriatingly, treacherously, that he would turn around and close it anyway.`,
       choices: [
-        { label: "Follow him into the deeper truth", next: "n5", setFlag: { name: "guarded", value: true } },
-        { label: "Question his intentions before going further", next: "n5_pressed", setFlag: { name: "guarded", value: true } }
+        { label: "Follow him into the deeper truth — Set aside your questions for now. Trust him enough to see what's actually failing beneath the throne room.", next: "n5", setFlag: { name: "guarded", value: true } },
+        { label: "Question his intentions before going further — Demand proof before you go any deeper. A hunter doesn't walk blind into a king's war.", next: "n5_pressed", setFlag: { name: "guarded", value: true } }
       ]
     },
 
@@ -234,8 +234,8 @@ When you surface again — breathless, unhurried, entirely undone — the torche
 
 "We should," he agrees, and doesn't move either.`,
       choices: [
-        { label: "Talk about the court anyway — follow him into the deeper truth", next: "n5", setFlag: { name: "guarded", value: false } },
-        { label: "Ask what this means before it goes further", next: "n5_pressed", setFlag: { name: "guarded", value: false } }
+        { label: "Talk about the court anyway — Follow him into the deeper truth. Let duty pull you both back to your feet, for now.", next: "n5", setFlag: { name: "guarded", value: false } },
+        { label: "Ask what this means before it goes further — Demand clarity on what just happened between you before either of you moves again.", next: "n5_pressed", setFlag: { name: "guarded", value: false } }
       ]
     },
 
@@ -258,8 +258,8 @@ The black water churns at the edges of the chamber, restless, reflecting torchli
 
 "It won't work." He exhales, long and unsteady, and for a moment looks less like a king and more like a man who has been carrying this alone in the dark for far longer than anyone ever should. "So. Whatever is true for you — I need to hear it now, standing here in the water that first brought us together. Not the version you think is safest to say out loud."`,
       choices: [
-        { label: "Open your heart completely", next: "n6_surrender" },
-        { label: "Hold the line — say only what's necessary", next: "n6_final_hold" }
+        { label: "Open your heart completely — Give him everything. Let three years of silence finally break all at once.", next: "n6_surrender" },
+        { label: "Hold the line — say only what's necessary — Protect what's left of yourself. Give the wards only the truth they need to survive, nothing more.", next: "n6_final_hold" }
       ]
     },
 
@@ -282,8 +282,8 @@ He leads you down through the court's oldest halls, past wards that flicker and 
 
 "There's a way to end this properly," he continues, urgency creeping back into his voice. "Not merely patch the wards — sever the eastern house's claim entirely. It requires both of us standing against them together, as a bound pair with nothing left hidden between us. Whatever is true for you — I need to hear it now, before the water decides for us."`,
       choices: [
-        { label: "Open your heart completely", next: "n6_surrender" },
-        { label: "Hold the line — say only what's necessary", next: "n6_final_hold" }
+        { label: "Open your heart completely — Give him everything. Let three years of silence finally break all at once.", next: "n6_surrender" },
+        { label: "Hold the line — say only what's necessary — Protect what's left of yourself. Give the wards only the truth they need to survive, nothing more.", next: "n6_final_hold" }
       ]
     },
 
@@ -296,8 +296,8 @@ He studies you for a long moment, and something in his face — the cautious, ba
 
 "Understood," he says quietly. "Then let's finish what we came here to do, on exactly those terms."`,
       choices: [
-        { label: "Stand together and end it, on those terms", branchOn: { flag: "guarded", ifTrue: "n6_severance", ifFalse: "n6_reckoning" } },
-        { label: "Walk away instead", next: "n6_unbound" }
+        { label: "Stand together and end it, on those terms — Finish what you started, exactly as agreed. No more, no less.", branchOn: { flag: "guarded", ifTrue: "n6_severance", ifFalse: "n6_reckoning" } },
+        { label: "Walk away instead — Refuse to perform a certainty you don't feel. Let the debt go unpaid rather than lie to seal it.", next: "n6_unbound" }
       ]
     },
 
