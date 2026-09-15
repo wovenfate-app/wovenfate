@@ -808,6 +808,36 @@ Then:
 **Android** can be built entirely locally via Android Studio (free,
 runs fine on Windows) — no cloud service needed for that half.
 
+### The Ember Court — full rewrite to a richer prose style (this session)
+
+All 14 nodes rewritten/expanded to match a new, more elaborate style:
+denser sensory detail, more internal physicality, new worldbuilding
+(the borderlands cabin setting, formal hunter's oath/training, the
+court reframed as a subterranean dark-water realm rather than
+ambiguous fae territory). Chapters 1–3 use the exact text provided;
+the remaining 11 nodes (the alternate paths, both Act 4/5 branches,
+and all 4 endings) were expanded to match that same density — 400–600
+words per chapter throughout, up from the original's roughly 250–350.
+Total length grew from ~4,000–5,000 words to just over 6,100.
+
+**Structure, locking, and branching are completely unchanged** —
+same 14 node IDs, same 9 locked behind the paywall, same choice
+targets and flag logic. Verified before shipping: brace-balanced,
+every single choice reference resolves to a real node, locked-node
+count matches the original exactly. This is a content rewrite, not a
+structural one.
+
+**Re-seed required** since story text changed:
+```
+node supabase/seed.js
+```
+
+**To verify:** read through fresh — confirm the new borderlands/hunter
+framing feels consistent start to finish, and that all 4 endings are
+still reachable via their original paths (guarded+hold → Severance,
+open-guard+hold → Reckoning, open heart → Surrender, walk away →
+Unbound).
+
 ### Deploy to Vercel
 
 1. Push this project to a GitHub repo.
