@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { AuthGate } from './AuthGate.jsx';
 import { isNativeApp } from '../engine/platform.js';
 
-export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error }) {
-  const [wantsToUnlock, setWantsToUnlock] = useState(false);
+export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error, waiting, setWaiting }) {
   const priceDisplay = title.price_cents
     ? `£${(title.price_cents / 100).toFixed(2)}`
     : '';
@@ -14,7 +12,7 @@ export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error 
       // anonymous session can be lost (cleared cookies, new device)
       // and take a paid unlock down with it. Price/description stay
       // visible either way; only the button's destination changes.
-      setWantsToUnlock(true);
+      setWaiting(true);
       return;
     }
     onUnlock();
@@ -44,7 +42,7 @@ export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error 
             it unlocks here automatically.
           </p>
         </div>
-      ) : isAnonymous && wantsToUnlock ? (
+      ) : isAnonymous && waiting ? (
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}>
           <AuthGate
             heading="Create a free account to continue"
@@ -52,7 +50,7 @@ export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error 
             redirectPath={`/?title=${titleId}&autoPurchase=single`}
           />
           <button
-            onClick={() => setWantsToUnlock(false)}
+            onClick={() => setWaiting(false)}
             style={{ background: 'none', border: 'none', color: 'var(--ink-dim)', fontSize: 12, textDecoration: 'underline', cursor: 'pointer', marginTop: 12, padding: 0 }}
           >
             Never mind

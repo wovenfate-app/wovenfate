@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { AuthGate } from './AuthGate.jsx';
 import { isNativeApp } from '../engine/platform.js';
 
@@ -9,8 +8,7 @@ import { isNativeApp } from '../engine/platform.js';
 const BUNDLE_PRICE_CENTS = 1000; // £10.00
 const MIN_CHARGE_CENTS = 30; // £0.30, Stripe's documented GBP minimum
 
-export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary, onUnlock, loading, error, redirectPath, compact }) {
-  const [wantsToUnlock, setWantsToUnlock] = useState(false);
+export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary, onUnlock, loading, error, redirectPath, compact, waiting, setWaiting }) {
 
   if (hasFullLibrary) {
     if (compact) return null; // nothing to upsell on the paywall if they already own everything
@@ -38,7 +36,7 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
   const countLabel = hasCredit ? `the remaining ${remaining.length} book${remaining.length === 1 ? '' : 's'}` : `all ${titles.length} books`;
 
   const handleClick = () => {
-    if (isAnonymous) { setWantsToUnlock(true); return; }
+    if (isAnonymous) { setWaiting(true); return; }
     onUnlock();
   };
 
@@ -64,7 +62,7 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
     );
   }
 
-  if (isAnonymous && wantsToUnlock) {
+  if (isAnonymous && waiting) {
     return (
       <div className={compact ? '' : 'page'}>
         <AuthGate
@@ -74,7 +72,7 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
           compact={compact}
         />
         <button
-          onClick={() => setWantsToUnlock(false)}
+          onClick={() => setWaiting(false)}
           style={{ background: 'none', border: 'none', color: 'var(--ink-dim)', fontSize: 12, textDecoration: 'underline', cursor: 'pointer', marginTop: 10, padding: 0 }}
         >
           Never mind

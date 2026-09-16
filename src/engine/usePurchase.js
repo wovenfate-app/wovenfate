@@ -9,7 +9,7 @@ import { supabase } from '../data/supabaseClient.js';
  * and calls the checkout-session function; it never writes a purchase
  * itself, by design.
  */
-export function usePurchase(userId, titleId) {
+export function usePurchase(userId, titleId, waitingForLink) {
   const [isUnlocked, setIsUnlocked] = useState(undefined); // undefined = still checking
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
@@ -53,6 +53,25 @@ export function usePurchase(userId, titleId) {
 
     return () => clearInterval(interval);
   }, [checkUnlockStatus]);
+
+  // Separate trigger for the cross-device case: reader started the
+  // purchase flow on this device, but confirmed email and completed
+  // checkout entirely on a different one (phone). There's no URL
+  // redirect to key off here — this device never navigated anywhere —
+  // so we poll directly on `waitingForLink` instead. This works
+  // regardless of whether this tab's own auth session ever refreshes,
+  // since the purchases-table check uses the same underlying user_id
+  // either way; is_anonymous going stale on this tab doesn't matter.
+  useEffect(() => {
+    if (!waitingForLink || !titleId) return;
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts += 1;
+      checkUnlockStatus();
+      if (attempts >= 40) clearInterval(interval); // ~3 minutes, then give up quietly
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [waitingForLink, titleId, checkUnlockStatus]);
 
   const startCheckout = useCallback(async () => {
     setCheckoutLoading(true);

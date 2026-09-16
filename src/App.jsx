@@ -76,8 +76,10 @@ export default function App() {
   }, [selectedTitleId]);
 
   const { initialProgress, saveProgress } = useReadingProgress(user?.id, selectedTitleId);
-  const purchase = usePurchase(user?.id, selectedTitleId);
-  const bundle = useBundlePurchase(user?.id, catalog?.length);
+  const [singleWaiting, setSingleWaiting] = useState(false);
+  const [bundleWaiting, setBundleWaiting] = useState(false);
+  const purchase = usePurchase(user?.id, selectedTitleId, singleWaiting);
+  const bundle = useBundlePurchase(user?.id, catalog?.length, bundleWaiting);
 
   useEffect(() => {
     if (bundle.hasFullLibrary && user?.id) {
@@ -173,6 +175,8 @@ export default function App() {
               loading={bundle.checkoutLoading}
               error={bundle.checkoutError}
               redirectPath="/?autoPurchase=bundle"
+              waiting={bundleWaiting}
+              setWaiting={setBundleWaiting}
             />
           </div>
         </div>
@@ -210,11 +214,15 @@ export default function App() {
       onBackToLanding={handleBackToLanding}
       accountModalOpen={accountModalOpen}
       setAccountModalOpen={setAccountModalOpen}
+      singleWaiting={singleWaiting}
+      setSingleWaiting={setSingleWaiting}
+      bundleWaiting={bundleWaiting}
+      setBundleWaiting={setBundleWaiting}
     />
   );
 }
 
-function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, accountModalOpen, setAccountModalOpen }) {
+function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
   const { currentNode, currentNodeId, choose, restart } = useStoryEngine(story, resumeFrom, onProgressChange);
   const narration = useNarration();
   const voiceChoice = useVoiceChoice();
@@ -364,6 +372,8 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
                 onUnlock={purchase.startCheckout}
                 loading={purchase.checkoutLoading}
                 error={purchase.checkoutError}
+                waiting={singleWaiting}
+                setWaiting={setSingleWaiting}
               />
               <BundlePromo
                 titles={catalog || []}
@@ -374,6 +384,8 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
                 loading={bundle.checkoutLoading}
                 error={bundle.checkoutError}
                 redirectPath={`/?title=${title.id}&autoPurchase=bundle`}
+                waiting={bundleWaiting}
+                setWaiting={setBundleWaiting}
                 compact
               />
             </>

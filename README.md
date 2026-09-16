@@ -906,6 +906,47 @@ the normal unlock button (or auto-proceed to checkout, if it was
 reached via a same-device redirect) within about 5 seconds, with no
 manual refresh.
 
+### Cross-device auto-refresh, corrected (this session)
+
+**The previous fix (relying on `supabase.auth.refreshSession()` to pick
+up updated auth claims) didn't actually work in testing** — and there
+turn out to be real, documented inconsistencies in exactly this part
+of Supabase's behavior (anonymous-to-linked account transitions don't
+reliably update session claims the way the docs imply). Rather than
+guess at a second auth-claims-based fix, this switches to a mechanism
+already proven to work elsewhere in the app: polling the `purchases`
+table directly by `user_id`, the same thing `usePurchase` already does
+after a same-device Stripe redirect.
+
+**Why this version is actually reliable, not just a second guess:** a
+reader's account `user_id` never changes when it gets linked from
+anonymous to a real account — only the `is_anonymous` flag does. The
+paywall's locked/unlocked state (`isLockedAndUnpaid` in `App.jsx`)
+already depends only on `purchase.isUnlocked`, never on `isAnonymous`
+— so this fix doesn't need the auth session to refresh *at all*. It
+just needs to notice the purchase row exists, which a plain database
+query can do regardless of what the stale tab's JWT still claims.
+
+**What changed:** `usePurchase` and `useBundlePurchase` both gained a
+`waitingForLink` parameter — when true, they poll the purchases table
+every ~4.5 seconds (giving up after ~3 minutes) independent of any URL
+parameter. That "waiting" state, previously local to `Paywall`/
+`BundlePromo`, is now lifted up to `App.jsx` (where the hooks
+themselves live) and passed down as `waiting`/`setWaiting` props, so
+the hook can actually see it.
+
+**`AuthGate`'s earlier refreshSession() polling was left in place**
+(harmless, and still potentially useful for the non-purchase "save your
+account" case, which has no purchases table to check against) — this
+is a second, more reliable safety net specifically for purchases, not
+a replacement.
+
+**To verify (the real cross-device test):** start a purchase on one
+device, complete email confirmation *and* checkout entirely on a
+different device, then just wait on the original screen — it should
+flip from paywall to unlocked content within about 5 seconds, with no
+manual refresh.
+
 ### Deploy to Vercel
 
 1. Push this project to a GitHub repo.

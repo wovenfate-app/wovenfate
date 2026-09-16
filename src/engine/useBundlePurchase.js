@@ -7,7 +7,7 @@ import { supabase, fetchPurchasedTitleIds } from '../data/supabaseClient.js';
  * usePurchase's shape, but there's no single titleId to check against —
  * ownership means "purchased count >= catalog size."
  */
-export function useBundlePurchase(userId, catalogSize) {
+export function useBundlePurchase(userId, catalogSize, waitingForLink) {
   const [hasFullLibrary, setHasFullLibrary] = useState(undefined); // undefined = still checking
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
@@ -39,6 +39,21 @@ export function useBundlePurchase(userId, catalogSize) {
 
     return () => clearInterval(interval);
   }, [checkOwnership]);
+
+  // Cross-device case: reader started on this device but confirmed
+  // email and completed checkout entirely on another one. Polls the
+  // purchases table directly by user_id, which works regardless of
+  // whether this tab's own auth session ever refreshes.
+  useEffect(() => {
+    if (!waitingForLink) return;
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts += 1;
+      checkOwnership();
+      if (attempts >= 40) clearInterval(interval); // ~3 minutes, then give up quietly
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [waitingForLink, checkOwnership]);
 
   const startBundleCheckout = useCallback(async () => {
     setCheckoutLoading(true);
