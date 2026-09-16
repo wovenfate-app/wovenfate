@@ -10,6 +10,7 @@ import { getSavedPosition, saveSavedPosition, clearSavedPosition } from './engin
 import { useVoiceChoice } from './engine/useVoiceChoice.js';
 import { usePurchase } from './engine/usePurchase.js';
 import { useBundlePurchase } from './engine/useBundlePurchase.js';
+import { resolveAutoPurchaseAction } from './engine/purchaseRedirect.js';
 import { ChapterView } from './components/ChapterView.jsx';
 import { ChoiceList } from './components/ChoiceList.jsx';
 import { EndingModal } from './components/EndingModal.jsx';
@@ -102,6 +103,11 @@ export default function App() {
   // making them find and click "Unlock" a second time — that extra step
   // is exactly the kind of thing that reads as broken even though
   // nothing's actually wrong, just an avoidable bit of friction.
+  //
+  // BUT: the email on this link might belong to an account that already
+  // owns this exact title/bundle — see resolveAutoPurchaseAction's header
+  // comment (purchaseRedirect.js) for why, and why blindly firing checkout
+  // here would double-charge a reader in that case.
   const autoPurchaseRef = useRef(false);
   useEffect(() => {
     if (autoPurchaseRef.current) return;
@@ -110,18 +116,28 @@ export default function App() {
     const autoPurchase = params.get('autoPurchase');
     if (!autoPurchase) return;
 
+    const action = resolveAutoPurchaseAction(autoPurchase, {
+      isUnlocked: purchase.isUnlocked,
+      hasFullLibrary: bundle.hasFullLibrary,
+    });
+    // 'wait': ownership isn't known yet — don't decide anything, and
+    // don't strip the URL param, until it resolves.
+    if (action === 'wait' || action === null) return;
+
     autoPurchaseRef.current = true;
     const url = new URL(window.location.href);
     url.searchParams.delete('autoPurchase');
     window.history.replaceState({}, '', url.pathname + url.search);
 
-    if (autoPurchase === 'bundle') {
+    if (action === 'bundle') {
       bundle.startBundleCheckout();
-    } else if (autoPurchase === 'single' && selectedTitleId) {
+    } else if (action === 'single' && selectedTitleId) {
       purchase.startCheckout();
     }
+    // action === 'skip': already owned — param is stripped above, and the
+    // app will just show the unlocked content once render catches up.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, isAnonymous, selectedTitleId]);
+  }, [authLoading, isAnonymous, selectedTitleId, purchase.isUnlocked, bundle.hasFullLibrary]);
 
   const handleBackToLanding = useCallback(() => {
     setSelectedTitleId(null);
