@@ -1,10 +1,23 @@
+import { useState } from 'react';
 import { AuthGate } from './AuthGate.jsx';
 import { isNativeApp } from '../engine/platform.js';
+import { useCrossDeviceEmailCheck } from '../engine/useCrossDeviceEmailCheck.js';
 
 export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error, waiting, setWaiting }) {
   const priceDisplay = title.price_cents
     ? `£${(title.price_cents / 100).toFixed(2)}`
     : '';
+
+  // Only relevant once AuthGate reports the email fell into the
+  // "already has an account" fallback (see useEmailAuth.js) — that's the
+  // one case the normal same-id refresh flow can't detect on its own.
+  const [crossDeviceEmail, setCrossDeviceEmail] = useState(null);
+  const [crossDeviceMode, setCrossDeviceMode] = useState(null);
+  const crossDevice = useCrossDeviceEmailCheck({
+    email: crossDeviceEmail,
+    active: crossDeviceMode === 'signin',
+    titleId,
+  });
 
   const handleUnlockClick = () => {
     if (isAnonymous) {
@@ -48,6 +61,8 @@ export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error,
             heading="Create a free account to continue"
             description="This keeps your purchase safe — it can't be lost even if you clear your browser or switch devices. No password needed."
             redirectPath={`/?title=${titleId}&autoPurchase=single`}
+            crossDevice={crossDevice}
+            onLinkSent={(email, mode) => { setCrossDeviceEmail(email); setCrossDeviceMode(mode); }}
           />
           <button
             onClick={() => setWaiting(false)}

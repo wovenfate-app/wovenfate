@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { AuthGate } from './AuthGate.jsx';
 import { isNativeApp } from '../engine/platform.js';
+import { useCrossDeviceEmailCheck } from '../engine/useCrossDeviceEmailCheck.js';
 
 // Mirrors the server's pricing exactly (see create-checkout-session)
 // so what's displayed always matches what Stripe will actually charge.
@@ -9,6 +11,16 @@ const BUNDLE_PRICE_CENTS = 1000; // £10.00
 const MIN_CHARGE_CENTS = 30; // £0.30, Stripe's documented GBP minimum
 
 export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary, onUnlock, loading, error, redirectPath, compact, waiting, setWaiting }) {
+  // See Paywall.jsx's identical setup for why this exists — covers the
+  // "email already has an account" fallback that same-id refresh polling
+  // can't detect on its own.
+  const [crossDeviceEmail, setCrossDeviceEmail] = useState(null);
+  const [crossDeviceMode, setCrossDeviceMode] = useState(null);
+  const crossDevice = useCrossDeviceEmailCheck({
+    email: crossDeviceEmail,
+    active: crossDeviceMode === 'signin',
+    bundle: true,
+  });
 
   if (hasFullLibrary) {
     if (compact) return null; // nothing to upsell on the paywall if they already own everything
@@ -70,6 +82,8 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
           description="This keeps your purchase safe — it can't be lost even if you clear your browser or switch devices. No password needed."
           redirectPath={redirectPath}
           compact={compact}
+          crossDevice={crossDevice}
+          onLinkSent={(email, mode) => { setCrossDeviceEmail(email); setCrossDeviceMode(mode); }}
         />
         <button
           onClick={() => setWaiting(false)}

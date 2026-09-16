@@ -1,11 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useEmailAuth } from '../engine/useEmailAuth.js';
 import { supabase } from '../data/supabaseClient.js';
+import { stripAutoPurchaseParam } from '../engine/purchaseRedirect.js';
 
-export function AuthGate({ heading, description, redirectPath, compact }) {
+// crossDevice is optional — only Paywall/BundlePromo pass it, since only
+// they know the titleId/bundle context a purchase check needs. When
+// present, { confirmed, resendForThisDevice } comes from
+// useCrossDeviceEmailCheck and covers the "email already had an account"
+// fallback path, which the ordinary refreshSession-based flow below
+// cannot: see that hook's header comment for why.
+export function AuthGate({ heading, description, redirectPath, compact, crossDevice, onLinkSent }) {
   const [email, setEmail] = useState('');
   const { status, error, mode, sendAuthLink } = useEmailAuth();
   const pollCountRef = useRef(0);
+  const [resendState, setResendState] = useState('idle'); // idle | sending | sent | error
 
   // While waiting on email confirmation, periodically force a fresh
   // session check. This matters specifically for the cross-device case
@@ -39,6 +47,63 @@ export function AuthGate({ heading, description, redirectPath, compact }) {
     return () => clearInterval(interval);
   }, [status]);
 
+  // Let the parent (Paywall/BundlePromo) know a link went out, and to
+  // whom + which path — it's the one that owns titleId/bundle context,
+  // so it's the one that can actually start the cross-device email check.
+  useEffect(() => {
+    if (status === 'sent') onLinkSent?.(email, mode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  // The purchase already happened (that's what got us here) — this link
+  // is only to get THIS device signed in, never to buy again. Strip
+  // autoPurchase so App.jsx's auto-checkout effect doesn't fire a second,
+  // needless (or worse, double-charging) checkout once this device lands
+  // back on the book already owned.
+  const handleResend = async () => {
+    setResendState('sending');
+    const { error: resendError } = await crossDevice.resendForThisDevice(stripAutoPurchaseParam(redirectPath));
+    setResendState(resendError ? 'error' : 'sent');
+  };
+
+  // The email turned out to already belong to an existing account, and
+  // that account's purchase has now been confirmed by
+  // useCrossDeviceEmailCheck — but confirmed on WHICHEVER device clicked
+  // the first link, not this one. This device's own session is still
+  // anonymous, so it genuinely can't read that purchase (RLS is right to
+  // refuse it). Getting signed in here for real needs a same-device
+  // link, which — unlike the first one — is guaranteed to work, since
+  // request and click both happen in this one browser.
+  if (crossDevice?.confirmed) {
+    return (
+      <div style={{ textAlign: compact ? 'left' : 'center' }}>
+        <p style={{ fontFamily: "'Fraunces', serif", fontSize: compact ? 15 : 18, margin: '0 0 6px' }}>
+          Purchase confirmed
+        </p>
+        <p style={{ fontSize: 13, color: 'var(--ink-dim)', lineHeight: 1.5 }}>
+          It's on your account — this device just isn't signed in yet.
+        </p>
+        {resendState === 'sent' ? (
+          <p style={{ fontSize: 13, color: 'var(--ink-dim)', marginTop: 10 }}>
+            Check <strong style={{ color: 'var(--ink)' }}>{email}</strong> on this device and click the link — it'll drop you right back here, unlocked.
+          </p>
+        ) : (
+          <button
+            onClick={handleResend}
+            className={compact ? 'narrator-btn' : 'choice-btn'}
+            style={compact ? {} : { fontWeight: 600 }}
+            disabled={resendState === 'sending'}
+          >
+            {resendState === 'sending' ? 'Sending…' : 'Finish signing in on this device'}
+          </button>
+        )}
+        {resendState === 'error' && (
+          <p style={{ fontSize: 12, color: 'var(--ember)', marginTop: 10 }}>Couldn't send that — try again in a moment.</p>
+        )}
+      </div>
+    );
+  }
+
   if (status === 'sent') {
     return (
       <div style={{ textAlign: compact ? 'left' : 'center' }}>
@@ -51,7 +116,9 @@ export function AuthGate({ heading, description, redirectPath, compact }) {
             : <>We sent a link to <strong style={{ color: 'var(--ink)' }}>{email}</strong> — click it to continue.</>}
         </p>
         <p style={{ fontSize: 12, color: 'var(--ink-dim)', marginTop: 10, fontStyle: 'italic' }}>
-          This page will update on its own once you've clicked it — even if you check your email on a different device.
+          {mode === 'signin'
+            ? "If you open it on a different device, come back to this tab afterward — we'll confirm the purchase here and get this device signed in too."
+            : "This page will update on its own once you've clicked it — even if you check your email on a different device."}
         </p>
       </div>
     );
