@@ -877,6 +877,35 @@ you have a native build running, confirm the paywall shows price +
 informational text with no button, while the web version still works
 exactly as before.
 
+### Cross-device auto-refresh while waiting on email confirmation (this session)
+
+**The bug:** if the magic link was checked on a *different* device than
+the one waiting (e.g., started on PC, clicked the email on phone), the
+PC tab stayed stuck showing "check your inbox" indefinitely — the
+purchase/account linking succeeded correctly, but the original tab had
+no way to know, since there's no live connection between two unrelated
+browser sessions.
+
+**The fix, and why it actually works for the cross-device case
+specifically:** `AuthGate` now polls `supabase.auth.refreshSession()`
+every ~4.5 seconds while waiting (giving up quietly after ~3 minutes).
+A plain local session check wouldn't have caught this — the original
+tab's *own* session genuinely hasn't changed. But `refreshSession()`
+asks Supabase for the account's *current server-side state*, which
+does reflect the other device's confirmation, since both devices
+share the same underlying account. That refresh fires the same
+auth-state-changed event `useAuth.js` already listens to everywhere
+else, so `isAnonymous` flips to `false` automatically — no new
+plumbing needed in `Paywall.jsx` or `BundlePromo.jsx`, since both
+already react correctly to that prop changing.
+
+**To verify (the real cross-device test):** start on one device, send
+the email, click the link on a *different* device, then just wait on
+the original screen without touching it — it should update to show
+the normal unlock button (or auto-proceed to checkout, if it was
+reached via a same-device redirect) within about 5 seconds, with no
+manual refresh.
+
 ### Deploy to Vercel
 
 1. Push this project to a GitHub repo.
