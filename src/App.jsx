@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTitle, fetchCatalog, fetchInProgressTitleIds, fetchPurchasedTitleIds } from './data/supabaseClient.js';
 import { useAuth } from './engine/useAuth.js';
+import { useAnalytics } from './engine/useAnalytics.js';
 import { useReadingProgress } from './engine/useReadingProgress.js';
 import { useStoryEngine } from './engine/useStoryEngine.js';
 import { useNarration } from './engine/useNarration.js';
@@ -22,6 +23,7 @@ import './styles/app.css';
 
 export default function App() {
   const { user, loading: authLoading, isAnonymous } = useAuth();
+  const { track } = useAnalytics(user?.id);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
 
   // Which title (if any) is selected. Reading straight from the URL on
@@ -80,6 +82,14 @@ export default function App() {
   const [bundleWaiting, setBundleWaiting] = useState(false);
   const purchase = usePurchase(user?.id, selectedTitleId, singleWaiting);
   const bundle = useBundlePurchase(user?.id, catalog?.length, bundleWaiting);
+
+  // Wrapped once here so both the landing-page bundle promo and the
+  // in-reader one (passed down to StoryReader) log the same event shape.
+  const trackedStartBundleCheckout = useCallback(() => {
+    track('checkout_started', { titleId: selectedTitleId, payload: { checkout_type: 'bundle' } });
+    bundle.startBundleCheckout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [track, selectedTitleId, bundle.startBundleCheckout]);
 
   useEffect(() => {
     if (bundle.hasFullLibrary && user?.id) {
@@ -171,7 +181,7 @@ export default function App() {
               purchasedIds={purchasedIds}
               isAnonymous={isAnonymous}
               hasFullLibrary={bundle.hasFullLibrary}
-              onUnlock={bundle.startBundleCheckout}
+              onUnlock={trackedStartBundleCheckout}
               loading={bundle.checkoutLoading}
               error={bundle.checkoutError}
               redirectPath="/?autoPurchase=bundle"
@@ -207,6 +217,7 @@ export default function App() {
       onProgressChange={saveProgress}
       purchase={purchase}
       bundle={bundle}
+      track={track}
       catalog={catalog}
       purchasedIds={purchasedIds}
       isAnonymous={isAnonymous}
@@ -222,7 +233,7 @@ export default function App() {
   );
 }
 
-function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
+function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, track, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
   const { currentNode, currentNodeId, choose, restart } = useStoryEngine(story, resumeFrom, onProgressChange);
   const narration = useNarration();
   const voiceChoice = useVoiceChoice();
@@ -293,6 +304,54 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
   }, [narration.hisVoice, narration.voices, updateSavedSettings]);
 
   const isLockedAndUnpaid = currentNode.locked && !purchase.isUnlocked;
+
+  // --- Reader-behavior tracking -------------------------------------
+  // Kept out of useStoryEngine itself (see that hook's header comment)
+  // and placed here instead, where title/purchase state is in scope.
+
+  // One event per chapter actually reached, locked or not — this is
+  // what answers "where do readers drop off" later.
+  useEffect(() => {
+    track('chapter_viewed', {
+      titleId: title.id,
+      payload: { node_id: currentNodeId, chapter: currentNode.chapter, locked: !!currentNode.locked },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentNodeId, title.id]);
+
+  const trackedChoose = useCallback((choice) => {
+    track('choice_made', { titleId: title.id, payload: { node_id: currentNodeId, choice_label: choice.label } });
+    choose(choice);
+  }, [track, title.id, currentNodeId, choose]);
+
+  // Guarded on node id so re-renders of the same locked chapter (e.g. a
+  // checkout error redraw) don't log the same paywall view repeatedly.
+  const paywallLoggedForRef = useRef(null);
+  useEffect(() => {
+    if (isLockedAndUnpaid && paywallLoggedForRef.current !== currentNodeId) {
+      paywallLoggedForRef.current = currentNodeId;
+      track('paywall_viewed', { titleId: title.id, payload: { node_id: currentNodeId } });
+    }
+  }, [isLockedAndUnpaid, currentNodeId, title.id, track]);
+
+  const endingLoggedForRef = useRef(null);
+  useEffect(() => {
+    if (!isLockedAndUnpaid && currentNode.ending && endingLoggedForRef.current !== currentNodeId) {
+      endingLoggedForRef.current = currentNodeId;
+      track('ending_reached', { titleId: title.id, payload: { ending_tag: currentNode.tag } });
+    }
+  }, [isLockedAndUnpaid, currentNode, currentNodeId, title.id, track]);
+
+  const trackedStartCheckout = useCallback(() => {
+    track('checkout_started', { titleId: title.id, payload: { checkout_type: 'single' } });
+    purchase.startCheckout();
+  }, [track, title.id, purchase]);
+
+  const trackedStartBundleCheckoutInReader = useCallback(() => {
+    track('checkout_started', { titleId: title.id, payload: { checkout_type: 'bundle' } });
+    bundle.startBundleCheckout();
+  }, [track, title.id, bundle]);
+  // --------------------------------------------------------------------
 
   const maybeListen = useCallback((node) => {
     if (handsFreeRef.current && node.choices) {
@@ -369,7 +428,7 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
                 title={title}
                 titleId={title.id}
                 isAnonymous={isAnonymous}
-                onUnlock={purchase.startCheckout}
+                onUnlock={trackedStartCheckout}
                 loading={purchase.checkoutLoading}
                 error={purchase.checkoutError}
                 waiting={singleWaiting}
@@ -380,7 +439,7 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
                 purchasedIds={purchasedIds}
                 isAnonymous={isAnonymous}
                 hasFullLibrary={bundle.hasFullLibrary}
-                onUnlock={bundle.startBundleCheckout}
+                onUnlock={trackedStartBundleCheckoutInReader}
                 loading={bundle.checkoutLoading}
                 error={bundle.checkoutError}
                 redirectPath={`/?title=${title.id}&autoPurchase=bundle`}
@@ -392,7 +451,7 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
           ) : (
             <div className="page page-transition" key={currentNode.chapter}>
               <ChapterView node={currentNode} />
-              <ChoiceList node={currentNode} onChoose={choose} onRestart={restart} />
+              <ChoiceList node={currentNode} onChoose={trackedChoose} onRestart={restart} />
             </div>
           )}
           {!isLockedAndUnpaid && currentNode.ending && (
