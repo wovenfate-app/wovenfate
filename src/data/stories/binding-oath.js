@@ -1,7 +1,8 @@
-// The Binding Oath — second title. Same { startNode, nodes } contract as
-// ember-court.js; same diamond branch structure (proven to work: every
-// choice screen has 2 real options, free through the "n3" tier, locked
-// from "n4" onward, 4 endings gated by the same guarded/trust flag).
+// The Binding Oath — second title. Rewritten/expanded to match Ember
+// Court's density and prose style while preserving the exact same
+// branch structure, locked flags, and choice logic as the original.
+// Same engine contract: { startNode, nodes }, each node
+// { chapter, text, choices | ending }.
 
 export const bindingOath = {
   startNode: "n1",
@@ -9,109 +10,131 @@ export const bindingOath = {
 
     n1: {
       chapter: "One — The Ritual",
-      text: `You'd been three heartbeats from freedom when he caught you — sword already drawn, dragon-marked eyes reflecting the wardlight of the tower you'd just finished robbing. Three heartbeats, and you'd have vanished into the dark with what you came for.
+      text: `Three heartbeats from freedom. That's all it would have taken — three heartbeats, the reliquary vault's outer ward already peeling back beneath your fingers like old paint, the stolen ledger already tucked warm against your ribs beneath your coat. Three heartbeats, and you'd have vanished down the tower's lower stairwell the way you'd vanished from a dozen wards before this one, leaving nothing behind but a story the mages would tell each other for years about the thief who was never quite caught.
 
-Instead, you're standing in the wreckage of a containment circle, his blade through the space where your chest used to be a moment ago, both of you staring down at your joined hands like they belong to someone else.
+Instead, cold steel finds the exact hollow of your throat before you've even registered the footsteps, and dragon-marked eyes — gold-slitted, entirely too alert for this hour — catch the wardlight streaming down through the vault's shattered containment circle.
 
-"What," he says, very carefully, "did you just do?"
+You do the only thing three years of training has ever actually taught you to do under a blade: you cast anyway.
 
-"Saved my own life, unless you'd like to try that again and find out what happens." Your voice comes out steadier than you feel. The binding-glyphs still glow faintly along your wrist, matching the ones now scored into his.
+The spell wasn't built for this. It was built to repel, to throw a body backward hard enough to buy you the width of a stairwell and nothing more. Instead, something in the vault's ruined wardwork catches your intent mid-cast and twists it, and the world goes white-hot at the wrist for one unbearable second before settling into something far stranger than a shove.
 
-He tries to step back. Gets exactly as far as you'd expect — which is to say, not far at all, before something invisible snaps taut between you like a leash pulled to its limit.
+You're both still standing when the light clears. His sword has gone through the space where your chest used to be a heartbeat ago. Neither of you moves. You're staring down at your joined hands — his gauntleted, yours bare and burned faintly silver along the wrist — like they belong to two entirely different people who wandered into this vault by accident.
 
-"Explain," he says, "before I decide this was worth losing my sword arm over."
+"What," he says, very carefully, each word set down like he's testing ice, "did you just do?"
 
-The spell wasn't supposed to do this. The spell was supposed to *repel* him, not chain the two of you together like a knot neither of you tied on purpose.`,
+"Saved my own life." Your voice comes out steadier than the rest of you feels. The binding-glyphs are still glowing faintly beneath your skin, matching the twin marks now scored raw into his. "Unless you'd like to try that sword arm again and find out what happens the second time."
+
+He tries to step back. Gets exactly as far as you'd expect — which is to say, barely half a stride — before something invisible snaps taut between your ribs and his like a leash pulled to the absolute limit of its give, yanking the air clean from your lungs.
+
+"Explain," he says, low, dangerous, "before I decide this was worth losing my sword arm over after all."
+
+The spell wasn't supposed to do this. The spell was supposed to repel him clean out of the vault, not chain the two of you together in a knot neither of you tied on purpose, in a language neither of you fully speaks.`,
       choices: [
-        { label: "Break away in fury — test how far you can go", next: "n2a" },
-        { label: "Stay put and demand he explain what he was doing here", next: "n2b" }
+        { label: "Break away in fury — Test the tether's limit. Force it to prove how far it will actually let you go.", next: "n2a" },
+        { label: "Stand your ground and demand answers — Make him explain himself first. You didn't come here to be interrogated.", next: "n2b" }
       ]
     },
 
     n2a: {
       chapter: "Two — The Length of the Tether",
-      text: `You turn and walk. It's petty, and satisfying, and lasts exactly nine steps before the tether snaps taut and yanks you backward off your feet.
+      text: `You turn on your heel and walk. It's petty, and it's satisfying for exactly nine strides before the tether snaps taut without warning and yanks you backward clean off your feet, your spine meeting stone hard enough to steal what little breath you had left.
 
-He catches you. Of course he catches you — dragon-blooded reflexes, insultingly fast, one arm around your waist before you hit the stone floor.
+He catches you before you land — of course he catches you, dragon-blooded reflexes making a mockery of the half-second you'd have needed to brace — one gauntleted arm looping around your waist like you weigh nothing at all.
 
-"A mile," he says, setting you upright like you weigh nothing, like this isn't the single worst night of either of your lives. "Give or take. I felt it stop giving."
+"A mile," he says, setting you upright with unnecessary gentleness, like tonight isn't already the worst night of either of your lives. "Give or take. I felt it stop giving somewhere around there."
 
 "Let go of me."
 
-"With pleasure." He does, immediately, like your skin offends him. Steps back to the exact edge of what the tether allows and no further, testing it with the same clinical precision he'd probably use on a wound. "This is a containment binding. Old work — older than either of us. You didn't cast this by accident."
+"With pleasure." He does, immediately, stepping back like your skin might burn him — testing the tether's exact limit with the same clinical precision he'd probably apply to a wound, one careful pace at a time until it pulls taut again and stops him cold. "This is a containment binding. Old work. Older than either of us, and considerably older than whatever simple ward you thought you were casting. You didn't build this by accident."
 
-"I cast a *ward*. This is not what a ward does."
+"I cast a ward. A basic repelling ward, the kind every apprentice learns before they're trusted with anything sharper. This is not what that spell does, and I would know, because I've cast that exact working forty times without incident."
 
-"Then someone rewrote it." His jaw tightens. "Or something about you resisted it hard enough to twist it into this instead."
+"Then someone rewrote it before you ever triggered it." His jaw tightens, gaze flicking down to the glyphs still glowing faint and silver along both your wrists, then back up to your face with something sharper than suspicion. "Or something about you resisted the working hard enough to twist it into this instead. Either way, this isn't the spell you believe you cast tonight."
 
-Neither of you says what you're both thinking: that whatever this is, it isn't undoing itself by morning.`,
+Neither of you says the thing you're both clearly thinking, turning it over in the taut, humming silence stretching between you: that whatever this actually is, it has no apparent intention of undoing itself by morning, and you are both, for the foreseeable future, exactly as stuck with each other as the dull ache in your wrist keeps insisting.`,
       choices: [
-        { label: "Accept it's real — ask what happens now", next: "n3" },
+        { label: "Accept it's real — Ask what happens now. Panic later, once there's actually time for it.", next: "n3" },
         { label: "Demand to know why a knight was hunting a mage tower alone", next: "n3_pressed" }
       ]
     },
 
     n2b: {
       chapter: "Two — What You Broke",
-      text: `You don't run. Running, you've learned, tends to go badly when someone else's magic is involved. Instead you stand your ground, arms crossed, doing your best impression of someone who isn't currently panicking.
+      text: `You don't run. Running, you have learned across three years of increasingly reckless heists, tends to go very badly the instant someone else's magic gets tangled into the mix. So instead you plant your boots against the stone and stand your ground, arms crossed, doing your very best impression of someone who is not currently, quietly panicking beneath a calm exterior.
 
-"You first," you say. "Dragon-blood doesn't patrol mage towers for fun. What were you actually doing here?"
+"You first," you say, tilting your chin toward the sword he still hasn't fully lowered. "Dragon-blood doesn't patrol mage towers on a whim, and it certainly doesn't patrol them alone, off the record, at this hour. What were you actually doing here tonight?"
 
-He studies you for a long moment — the kind of look that catalogues weapons, exits, and weaknesses all at once, old training that doesn't switch off just because his hand is currently tangled in an involuntary magical leash. "Hunting something that's been stealing from this tower for three months. I didn't expect it to be—" he gestures at you, vaguely, "—this."
+He studies you for a long moment — the particular, cataloguing look of a trained soldier weighing weapons, exits, and weaknesses all at once, a habit that apparently doesn't switch off just because his hand is currently bound to yours by magic neither of you asked for. "Hunting something that's been bleeding this tower dry for three months running. Ledgers, relics, old binding-work, gone one careful piece at a time. I didn't expect it to be—" he gestures at you, vaguely, almost helplessly, "—this."
 
-"This meaning a mage. Shocking."
+"This meaning a mage. How shocking, a mage robbing a mage tower."
 
-"This meaning someone who casts wards strong enough to nearly take my arm off and *still* got caught." Something almost like respect flickers behind the irritation. "That's not nothing."
+"This meaning someone skilled enough to cast a ward that nearly took my arm off, and still got caught in the act regardless." Something that might, infuriatingly, be respect flickers behind the irritation in his expression. "That's not nothing, in my experience of this particular trade."
 
-"I'll treasure the compliment." You hold up your bound wrist, glyphs still faintly glowing. "Meanwhile."
+"I'll treasure the compliment for exactly as long as it takes this tether to stop humming against my ribs." You lift your bound wrist between you, glyphs still faintly aglow in the dark. "Meanwhile, we appear to have a rather more pressing problem than my professional competence to discuss."
 
-"Meanwhile." He exhales, the sound of a man recalculating an entire evening. "We should probably not be standing in the ruins of a warded tower when the actual owners arrive."`,
+"Meanwhile." He exhales, long and slow, the exact sound of a man recalculating an entire evening's careful plans from the ground up. "We should probably not be standing in the wreckage of a warded tower when whoever actually owns it comes to investigate the noise we've just made."
+
+You glance past him at the shattered containment circle, still faintly smoking at its edges, and privately agree. Whatever explanation either of you might owe the tower's actual guardians, it isn't one either of you is equipped to give convincingly tonight — not with a stranger's pulse hammering visibly at his throat, not with your own wrist still burning faint silver beneath your sleeve. "Somewhere private, then. Somewhere I can actually see what you've done to my magic without an audience."
+
+"Your magic did this to itself, as far as I can tell." But he's already moving toward the stairwell, testing the tether's give with each step, waiting — without quite admitting he's waiting — to see whether you'll follow or force the leash taut between you.
+
+You follow. You tell yourself it's only because you have no better option tonight.`,
       choices: [
-        { label: "Accept it's real — ask what happens now", next: "n3" },
+        { label: "Accept it's real — Ask what happens now. Panic later, once there's actually time for it.", next: "n3" },
         { label: "Demand to know why a knight was hunting a mage tower alone", next: "n3_pressed" }
       ]
     },
 
     n3: {
       chapter: "Three — The Truth of It",
-      text: `You find an abandoned grain store two streets over, defensible enough that neither of you can relax but private enough to actually think. He paces the length the tether allows — precisely half the room, over and over, like counting steps might change the answer.
+      text: `You find an abandoned grain store two streets over, defensible enough that neither of you can fully relax, private enough to actually think without an audience. He paces the length the tether allows — precisely half the room and back, over and over, boots scuffing old chaff across the floorboards, like counting his steps enough times might change whatever answer is waiting at the end of them.
 
-"A binding this old doesn't break on its own," he says finally. "It has conditions. Terms. Old magic never just *stops* — it resolves."
+"A binding this old doesn't simply break on its own," he says finally, stopping mid-stride, torchlight catching the tension along his jaw. "It has conditions. Terms, woven into the original casting like thread through cloth. Old magic never just stops — it resolves, one way or another, and rarely the way either party involved actually expects."
 
 "Resolves how?"
 
-"That depends what triggered it." He stops pacing, finally, close enough that the tether goes slack between you for the first time since the tower. "Wards like this usually key to survival — cast in a moment someone genuinely believed they were about to die. Which means it thinks its job isn't done yet."
+"That depends entirely on what triggered it in the first place." He stops pacing altogether, close enough now that the tether goes slack between you for the first time since the tower. "Wards like this typically key to survival — cast in a single moment where someone genuinely believed, all the way down to the bone, that they were about to die. Which means, as far as the magic is concerned, its work isn't finished yet, whatever either of us might prefer."
 
-"Its job being."
+"Its work being."
 
-"Keeping you alive." His eyes flick to the tether, then back to you, something unreadable crossing his face. "Possibly by keeping me close enough to make sure of it, given I was the immediate threat when it triggered."
+"Keeping you alive." His eyes flick briefly to the tether humming faint between you, then back to your face, something unreadable moving behind them. "Possibly by keeping me close enough to guarantee it, given that I was the most immediate threat standing in the room the instant it triggered."
 
-"You're saying I accidentally recruited my own attacker as a bodyguard."
+"You're telling me I accidentally recruited my own attacker as an unpaid, extremely well-armed bodyguard."
 
-"I'm saying," he says, "that until we understand this properly, neither of us is getting further than a mile from the other — so you may as well stop looking at me like I'm the inconvenience here."`,
+"I'm telling you," he says, and something almost like dry humor threads through the words despite everything, "that until we understand this properly, neither of us is getting further than a mile from the other. So you may as well stop looking at me like I'm the single worst part of tonight. I promise you, on my house's name, that I am not even in the top three."
+
+You want to argue. You find, somewhat to your own irritation, that you can't quite manage it.`,
       choices: [
-        { label: "Guard yourself — keep this strictly practical", next: "n4a" },
+        { label: "Guard yourself — Keep this strictly practical. You don't need to like him to survive this.", next: "n4a" },
         { label: "Let the forced closeness actually mean something", next: "n4b" }
       ]
     },
 
     n3_pressed: {
       chapter: "Three — Before You Accept",
-      text: `"Not so fast." You plant yourself, tether or no tether. "You don't get to skip past *why a knight was alone in a mage tower at midnight* just because we're stuck together now."
+      text: `"Not so fast." You plant yourself exactly where you're standing, tether or no tether, every instinct honed by three years of careful thieving refusing to let this go without real answers first. "You don't get to skip past why a knight was alone in a mage tower at midnight just because we're apparently stuck together now."
 
-He goes very still — the particular stillness of someone deciding how much truth is safe to hand over. "I wasn't sent. I came on my own information, off the record, because the official channels have been compromised for months and I didn't trust anyone else to actually catch whoever's been bleeding that tower dry."
+He goes very still — the specific, deliberate stillness of a trained soldier deciding exactly how much truth is safe to hand a mage who nearly took his arm off an hour ago. "I wasn't sent. I came on my own information, entirely off the record, because the official channels have been compromised for months now and I didn't trust anyone else in my chain of command to actually catch whoever's been bleeding this tower dry, piece by careful piece."
 
-"That's not an answer, that's a confession with extra steps."
+"That's not an answer. That's a confession wearing an answer's clothes."
 
-"It's the truth, which is more than I usually offer people who've just tried to gut me with a ward." A ghost of something like respect in his voice now. "I don't know yet if you're what I was hunting, or just unlucky timing. I intend to find out. Together, apparently, whether either of us likes it."
+"It's the truth, which is considerably more than I usually offer people who've just tried to gut me with a rewritten ward." A ghost of something like genuine respect moves through his voice now, unmistakable even in the dark. "I don't know yet whether you're what I was actually hunting, or simply the worst timing of my entire career. I intend to find out. Together, apparently, whether either of us particularly likes the arrangement we've been handed."
 
-"And if I'm exactly what you were hunting?"
+"And if I turn out to be exactly what you were hunting all along?"
 
-"Then we'll have a very different conversation." He holds your gaze, steady. "But I don't think you are. Call it instinct."
+"Then we'll have a very different conversation than this one." He holds your gaze, steady, unflinching, close enough now that you can see the exact moment he decides to mean it. "But I don't think you are. Call it instinct, or call it three months of chasing someone considerably less competent than you've already proven yourself to be tonight."
 
-The tether pulls taut as he steps back — testing it again, an old habit already forming.`,
+The tether pulls taut as he steps back, testing its limit again — an old habit already forming, barely an hour old and already worn smooth as a well-used blade against a whetstone.
+
+"Three months," you say slowly, turning the number over. "That's a long time to hunt something alone, off the record, trusting no one in your own chain of command."
+
+"It's a long time to watch your own house bleed and not know who's holding the knife." Something old and tired moves behind his eyes, there and gone before you can name it properly. "You'll forgive me if I'm not eager to discover it's you, after all this. I find I'd rather it wasn't."
+
+"Charming. Most people just say they hope I'm not a criminal."
+
+"You are, demonstrably, a criminal." A ghost of dry humor returns to his voice. "I said I hoped you weren't the *specific* criminal I came here to catch. There's a meaningful difference, and I intend to hold onto it."`,
       choices: [
-        { label: "Guard yourself — keep this strictly practical", next: "n4a" },
+        { label: "Guard yourself — Keep this strictly practical. You don't need to like him to survive this.", next: "n4a" },
         { label: "Let the forced closeness actually mean something", next: "n4b" }
       ]
     },
@@ -119,21 +142,31 @@ The tether pulls taut as he steps back — testing it again, an old habit alread
     n4a: {
       locked: true,
       chapter: "Four — Guarded",
-      text: `"Practical," you say, putting as much distance between you as the tether allows, which isn't much, but it's the principle of the thing. "We figure out how to break this. We don't make it complicated."
+      text: `"Practical," you say, putting as much distance between you as the tether's mile-long leash currently allows — which, at this range, amounts to barely a full stride, but the principle matters more than the actual inches gained. "We find out how to break this. We don't make it complicated by dressing it up as something it isn't."
 
-"Complicated," he repeats, like he's testing the word for hidden meaning.
+"Complicated," he repeats, turning the word over slowly, like he's testing it for a hidden blade concealed somewhere in the syllables.
 
-"You know what I mean."
+"You know precisely what I mean."
 
-"I do." He doesn't argue — which somehow lands worse than if he had. Steps back too, matching your distance like a man relieved to have permission. "Practical suits me. I have a war-band waiting on a report I'm now three days late for, and you presumably have a life that doesn't involve permanent proximity to dragon-blood."
+"I do." He doesn't argue, which somehow lands worse than if he had — steps back too, matching your careful distance like a man almost relieved to finally have permission to retreat behind old, practiced composure. "Practical suits me perfectly well. I have a war-band waiting on a report I am now three days late delivering, and you presumably have an entire life of your own that doesn't involve permanent proximity to dragon-blood."
 
 "Presumably."
 
-"Then we find whoever rewrote this binding, we break it, and we go back to being strangers who tried to kill each other once." His voice is carefully even, the tone of a man closing a door with great precision instead of slamming it. "Efficient."
+"Then we find whoever rewrote this binding, we break it clean, and we go back to being strangers who once tried rather enthusiastically to kill each other in a mage tower." His voice has gone carefully, deliberately even, the tone of a man closing a door with great precision rather than slamming it in anger. "Efficient."
 
-"Efficient," you agree, and try to ignore how hollow the word sounds now that it's actually been said out loud.
+"Efficient," you echo, and try, with limited success, to ignore how hollow the word sounds now that it's actually been said aloud between you, hanging in the grain-dusty air like something neither of you quite meant.
 
-He doesn't push. You almost wish he would.`,
+He gathers his coat, checks the tether's give with one more testing step, and says nothing further. His silence has its own particular weight to it — the silence of a soldier who has already decided the conversation is over, whatever he might privately feel about that decision. You tell yourself the distance is exactly what you wanted. You almost believe it.
+
+He doesn't try to close the gap again. You almost wish, treacherously, infuriatingly, that he would.
+
+You spend the next stretch of silence cataloguing exits out of old habit, the way you catalogue every room you've ever robbed — windows, weak floorboards, the single door — and find, somewhat to your own annoyance, that you're also cataloguing him. The set of his shoulders when he thinks you're not watching. The particular economy of his movements, nothing wasted, nothing performed. A soldier's habits, worn deep enough to survive even a night like this one.
+
+"You're staring," he says, without turning around.
+
+"I'm assessing. There's a difference."
+
+"Is there." He finally does turn, something almost like amusement flickering at the corner of his mouth despite everything. "Do let me know what you conclude."`,
       choices: [
         { label: "Follow the trail of who did this", next: "n5", setFlag: { name: "guarded", value: true } },
         { label: "Question whether he's really as unaffected as he claims", next: "n5_pressed", setFlag: { name: "guarded", value: true } }
@@ -143,25 +176,33 @@ He doesn't push. You almost wish he would.`,
     n4b: {
       locked: true,
       chapter: "Four — Undone",
-      text: `You don't put the distance between you. It's the only decision you make on purpose — after that, there's just how close the grain store's single lantern makes everything feel, and the fact that neither of you has stepped back since the tether went slack.
+      text: `You don't put the distance between you. It's the only decision you make entirely on purpose tonight — after that, there is only the grain store's single guttering lantern making everything feel closer than it should, and the plain, undeniable fact that neither of you has stepped back since the tether went slack between you.
 
-"This is a terrible idea," you say, not moving.
+"This is a genuinely terrible idea," you say, not moving an inch.
 
-"Almost certainly." His voice has dropped, rougher than the clipped knight's-tone from an hour ago. "You did just try to kill me."
+"Almost certainly." His voice has dropped, rougher now than the clipped, soldierly tone from an hour ago, closer too, though you can't quite pinpoint when that happened. "You did, in fairness, just try to kill me rather thoroughly not two hours past."
 
-"You were hunting me first."
+"You were hunting me first. I was well within my rights to defend myself."
 
-"Fair." His hand finds your jaw, unhurried, like a man who's spent the last hour arguing himself out of exactly this and losing. "For what it's worth — I don't think you're what I came here to catch."
+"Fair." His hand finds your jaw, unhurried, like a man who's spent the better part of the last hour arguing himself out of exactly this and steadily, comprehensively losing every single round of that argument. "For what it's worth — I don't believe you're what I actually came here to catch tonight."
 
 "That's not an apology."
 
-"No." Something almost like a smile. "It's a start."
+"No." Something that might, in the low lantern light, almost be a smile tugs at the corner of his mouth. "It's a start. The apology comes later, once I've worked out exactly what I'm apologizing for."
 
-You close what little distance the tether left between you, and let that be the answer neither of you has words for yet. Whatever this binding actually wants from the two of you, it stops mattering for a while — just the lantern light, and three months of hunting resolving into something neither of you expected to find at the end of it.
+You close what little distance the tether left between the two of you, and let that be the answer neither of you has proper words for yet. Whatever this binding truly wants from you both stops mattering for a while — just the lantern's warm, unsteady light against old grain-dust, and three months of careful, patient hunting resolving into something neither of you expected to find waiting at the end of it, in a place like this, on a night like this one.
 
-"We should still talk about the ward," you murmur eventually, not moving.
+"We should still talk about the ward," you murmur eventually, still not moving, his heartbeat steady beneath your palm.
 
-"We should," he agrees, and doesn't move either.`,
+"We should," he agrees, and doesn't move either.
+
+The lantern gutters lower, throwing both your shadows long and strange across the grain store's dusty floor. Somewhere beyond these walls, the mage tower's owners are almost certainly discovering the wreckage you left behind, and somewhere beyond that, whoever rewrote your ward into this is almost certainly still watching for exactly this kind of complication. None of it feels quite real enough to move for yet.
+
+"This changes things," he says finally, quiet, not quite a question.
+
+"It does." You don't pretend otherwise. "I don't know yet what it changes them into."
+
+"No," he agrees. "Neither do I. I find I'm not in any particular hurry to find out tonight."`,
       choices: [
         { label: "Talk about the ward anyway — follow the trail of who did this", next: "n5", setFlag: { name: "guarded", value: false } },
         { label: "Ask what this means before it goes further", next: "n5_pressed", setFlag: { name: "guarded", value: false } }
@@ -171,79 +212,85 @@ You close what little distance the tether left between you, and let that be the 
     n5: {
       locked: true,
       chapter: "Five — The Deeper Truth",
-      text: `The trail leads, infuriatingly, back toward his own war-band's territory — and the deeper truth waiting there is worse than either of you expected.
+      text: `The trail leads, infuriatingly, straight back toward his own war-band's territory — and the deeper truth waiting there proves considerably worse than either of you expected to uncover tonight.
 
-"It wasn't random," he admits, once the pieces are laid out between you: ledgers, a rewritten glyph-key, a name that makes his expression go carefully blank. "Someone in my own house has been selling old binding-magic to whoever's been robbing mage towers up and down the coast. Your ward didn't misfire. It was *sabotaged* — rewritten to bind whoever triggered it to the nearest dragon-blood, permanently, as insurance against exactly the kind of knight who might come asking questions."
+"It wasn't random," he admits, once the pieces are finally laid bare on the table between you: old ledgers, a rewritten glyph-key, a name that makes his expression go carefully, deliberately blank in a way that tells you exactly how much it costs him to hold it still. "Someone within my own house has been selling old binding-magic to whoever's been robbing mage towers up and down this entire coastline for months. Your ward didn't misfire by accident. It was sabotaged — deliberately rewritten to bind whoever triggered it permanently to the nearest dragon-blood, as insurance against precisely the kind of knight who might come asking inconvenient questions afterward."
 
 "Insurance against you specifically."
 
-"Against anyone who might interfere." His jaw tightens. "Which means this binding isn't an accident we can just dissolve once we find the source. It's a weapon someone built on purpose — and it's still active, which means whoever built it can likely still see through it, in ways we haven't found yet."
+"Against anyone within my house who might interfere with the operation." His jaw tightens, the muscle working visibly beneath old scar tissue. "Which means this binding isn't simply an accident we can dissolve the moment we locate its source. It's a weapon someone built on purpose, with real intent behind every glyph — and it's still active, which means whoever built it can very likely still see through it, in ways neither of us has found yet."
 
-"So it's not just about breaking the tether."
+"So this was never only about breaking the tether between us."
 
-"No." He meets your eyes, unflinching. "It's about whether we can end this cleanly — sever their control over it entirely — or whether we're stuck managing a leash someone else still holds the other end of. That takes both of us, genuinely aligned, nothing held back. If either of us is still protecting some piece of ourselves—"
+"No." He meets your eyes, unflinching, letting you see exactly how much this admission costs a man sworn to defend the very house that's rotting from within. "It's about whether we can end this cleanly — sever their control over the working entirely, root and branch — or whether we remain stuck managing a leash someone else still holds the far end of, indefinitely. That requires both of us, genuinely aligned, nothing held back between us at all. If either of us is still protecting some piece of ourselves—"
 
 "It won't work."
 
-"It won't work." He exhales. "So — whatever's actually true for you. I need it now, not the safe version."`,
+"It won't work." He exhales, long and unsteady, the sound of a man setting down a weight he's carried alone for too long. "So. Whatever's actually true for you — I need it now, standing here over the evidence of my own house's betrayal. The real version. Not the safe one."`,
       choices: [
-        { label: "Open your heart completely", next: "n6_surrender" },
-        { label: "Hold the line — say only what's necessary", next: "n6_final_hold" }
+        { label: "Open your heart completely — Give him everything the binding is actually asking for. Stop guarding, start choosing.", next: "n6_surrender" },
+        { label: "Hold the line — say only what's necessary — Protect what's left of yourself. Give him only the truth he needs, nothing more.", next: "n6_final_hold" }
       ]
     },
 
     n5_pressed: {
       locked: true,
       chapter: "Five — What This Costs",
-      text: `Before either of you moves toward the trail, you stop him. "Before we chase this any further — what does it actually cost you, if this doesn't resolve clean? You said your own house is compromised. What happens to you if we expose them?"
+      text: `Before either of you moves toward the trail, you stop him with a hand flat against his chest, feeling his pulse jump beneath your palm despite his carefully composed expression. "Before we chase this any further — what does it actually cost you, if this doesn't resolve cleanly? You said your own house is compromised. What happens to you specifically, if we expose them for what they've done?"
 
-He's quiet long enough that you know the honest answer isn't comfortable. "Everything, potentially. Rank, standing, maybe worse, depending how deep the rot runs. I'm asking you to help me burn down my own house from the inside, and I don't have the right to pretend that's a small thing to ask."
+He's quiet long enough that you already know, before he even speaks, that the honest answer isn't a comfortable one. "Everything, potentially. Rank, standing, quite possibly worse, depending how deep this particular rot actually runs beneath the surface. I'm asking you to help me burn down my own house from the inside, and I don't have the right to pretend that's a small thing to ask of anyone, let alone a stranger I bound to myself by accident."
 
-"Then why do it?"
+"Then why do it at all? Why not simply walk away and let someone else carry that particular weight?"
 
-"Because the alternative is letting whoever did this keep using people like you as raw material for weapons like this one." Something steady and certain in his voice now, no performance left in it. "That matters more to me than what it costs me. I'd rather lose my house honestly than keep it built on this."
+"Because the alternative is letting whoever orchestrated this keep using people like you as raw material for weapons exactly like this one, over and over, until someone finally stops them." Something steady and entirely certain settles into his voice now, no performance left in it whatsoever, no soldier's careful diplomacy. "That matters more to me than whatever it personally costs me to say it aloud. I would rather lose my house honestly than continue standing inside one built on this kind of foundation."
 
-It's not comfortable, but it's real — and today that counts for more than comfort would.
+It isn't comfortable, watching a man decide to dismantle his own life in front of you. But it is real, unmistakably real, and tonight, standing this close to him with the tether humming quiet between your ribs, that counts for considerably more than comfort ever could.
 
-The trail leads back toward his own war-band's territory, and what's waiting there is worse than either of you expected: ledgers, a rewritten glyph-key, a name that makes his expression go carefully blank. Someone in his own house built this binding on purpose, as a weapon.
+The trail leads back toward his own war-band's territory, and what's waiting there proves worse than either of you expected: old ledgers, a rewritten glyph-key, a name that makes his expression go carefully blank. Someone within his own house built this binding on purpose, as a weapon aimed at strangers exactly like you.
 
-"Whatever's true for you," he says, once the full shape of it is laid bare between you, "I need it now. Not the safe version."`,
+"Whatever's true for you," he says, once the full shape of the betrayal lies bare between you both, "I need it now. Not the safe version. Not anymore."`,
       choices: [
-        { label: "Open your heart completely", next: "n6_surrender" },
-        { label: "Hold the line — say only what's necessary", next: "n6_final_hold" }
+        { label: "Open your heart completely — Give him everything the binding is actually asking for. Stop guarding, start choosing.", next: "n6_surrender" },
+        { label: "Hold the line — say only what's necessary — Protect what's left of yourself. Give him only the truth he needs, nothing more.", next: "n6_final_hold" }
       ]
     },
 
     n6_final_hold: {
       locked: true,
       chapter: "Six — What You're Willing to Risk",
-      text: `"What's necessary," you say, "is that we sever their control and neither of us gets killed doing it. That's what's true. The rest isn't relevant to winning this."
+      text: `"What's necessary," you say, and you make yourself hold his gaze while you say it, "is that we sever their control over this and neither of us dies proving a point in the process. That's what's true tonight, standing over your house's own betrayal. The rest of it isn't relevant to actually winning this fight."
 
-He studies you a long moment, and whatever cautious hope had been building behind his eyes quietly closes, like a door pulled to without slamming.
+He studies you a long moment, and whatever cautious hope had been quietly building behind his eyes since the grain store closes like a door pulled carefully shut rather than slammed.
 
-"Understood," he says, quiet. "Then let's finish this on those terms."`,
+"Understood," he says, quiet, controlled. "Then let's finish this on exactly those terms, and nothing more."`,
       choices: [
         { label: "Stand together and end it, exactly as agreed", branchOn: { flag: "guarded", ifTrue: "n6_severance", ifFalse: "n6_reckoning" } },
-        { label: "Walk away instead", next: "n6_unbound" }
+        { label: "Walk away instead — Refuse to finish this on a lie. Let the binding fade slowly rather than force it.", next: "n6_unbound" }
       ]
     },
 
     n6_surrender: {
       locked: true,
       chapter: "Six — Surrender",
-      text: `"The truth," you say, "is that I stopped thinking of this as a leash somewhere around the point I started being disappointed when you stepped too far away. I don't know when that happened. I know I don't want to undo it just because it's inconvenient to admit."
+      text: `"The truth," you say, "is that I stopped thinking of this as a leash somewhere around the point I started feeling disappointed whenever you stepped too far toward the edge of its reach. I don't know precisely when that happened, or which hour of this impossible night it snuck up on me. I only know I don't want to undo it now, simply because admitting it out loud is inconvenient — or because a house full of strangers is about to watch me say it."
 
-He crosses what little distance remains in two steps, and this time there's no tether pulling him, no ritual, no excuse required — just his hands framing your face like he's committing it to memory against the possibility of losing it.
+He crosses what little distance remains between you in two unhurried steps, and this time there's no tether pulling him, no dying ritual, no convenient excuse required — just his hands framing your face like he's committing every line of it to memory against the possibility of losing it all over again, the way he very nearly did in that vault.
 
-"Say that again," he murmurs, "somewhere the whole rotten house of mine can hear it."
+"Say that again," he murmurs, forehead dropping to rest against yours, breath unsteady. "Somewhere the whole rotten house of mine can properly hear it."
 
-You do — standing over the evidence that's about to end his standing and expose a conspiracy three months in the making, the two of you speak the whole truth out loud, nothing held back for either of you to hide behind. The rewritten glyph-key unravels in your joined hands, the sabotage undone not by force but by there being nothing left in either of you for it to exploit.
+You do. Standing over the evidence that's about to end his standing and expose a conspiracy three months in the careful making, the two of you speak the whole truth aloud, nothing held back for either of you to hide behind any longer. The rewritten glyph-key unravels between your joined hands, the sabotage undone not by force or blade but by there being nothing left in either of you for it to exploit, no seam, no guarded corner.
 
-Whatever comes next — his house, the fallout, the parts of both your lives this upends — you face it having already said the truest thing either of you has said all week.
+Whatever comes next — his house, the fallout, every part of both your lives this single night upends completely — you face it having already said the truest thing either of you has managed to say aloud all week.
 
-"Stay," he says. Not a command. A question, for the first time.
+"Stay," he says. Not a command this time. A genuine question, for the first time since the tower.
 
-"Try and stop me," you answer, and mean every word of it.`,
+"Try and stop me," you answer, and mean every single word of it, the tether between you finally, quietly, feeling like something other than a chain.
+
+Later, when the worst of tonight's fallout has settled into something more like a plan than a disaster, he traces the fading glyph along your wrist with something that looks almost like wonder. "It's healing," he says. "The binding. It's healing like a wound instead of scarring like a weapon."
+
+"Maybe it never was one. Maybe it was just waiting for someone to actually mean what they said standing inside it."
+
+He doesn't have an answer for that. He doesn't seem to need one, not tonight.`,
       ending: true,
       tag: "Ending: Surrender"
     },
@@ -251,21 +298,29 @@ Whatever comes next — his house, the fallout, the parts of both your lives thi
     n6_reckoning: {
       locked: true,
       chapter: "Six — Reckoning",
-      text: `"What's true," you say, "is that I stopped seeing you as the enemy days ago, and I'm not going to pretend that's nothing. But I'm also not going to pretend it's simple, not with everything this is about to cost you."
+      text: `"What's true," you say, "is that I stopped seeing you as the enemy several days ago now, if I'm entirely honest with both of us, and I'm not going to pretend that's nothing. But I'm also not going to pretend it's simple, not with everything this particular truth is about to cost you and your house."
 
-It's not the declaration he might have hoped for. You watch him recalibrate rather than deflate.
+It isn't the declaration he might have quietly hoped for, standing over evidence that's about to unmake everything he's known. You watch him recalibrate rather than deflate, shoulders squaring instead of dropping, the soldier in him rising to meet even this.
 
-"It's honest," he says. "That's what this needs — not a fairy tale, the truth, whatever shape it takes."
+"It's honest," he says. "That's precisely what this needs tonight — not a fairy tale sworn over stolen ledgers, but the truth, whatever imperfect shape it actually takes."
 
-Standing over the evidence together, you speak your complicated, careful truth aloud, and it's enough — the sabotage unravels, his house's conspiracy laid bare for what it is, undone by two people who told the truth without needing it to be a love story yet.
+Standing over the evidence together, you speak your complicated, careful truth aloud, and it proves enough — the sabotage unravels at the seams, his house's conspiracy laid bare for exactly what it is, undone by two people who told the truth without needing it to already be a love story to matter.
 
-Afterward, in the wreckage of everything his house is about to lose, he doesn't reach for you the way he might have if you'd said something softer.
+Afterward, in the wreckage of everything his house is about to lose, he doesn't reach for you the way he might have if you'd said something softer, something easier to hear in this exact moment.
 
-"We don't have to decide the rest of it tonight," he says instead. "The binding's broken either way. Whatever's between us can take whatever time it actually needs."
+"We don't have to decide the rest of it tonight," he says instead, voice careful. "The binding's broken either way now. Whatever exists between us can take whatever time it actually needs to become something real, rather than something rushed."
 
-"That's unexpectedly reasonable of a man who just burned his own house down."
+"That's unexpectedly reasonable, for a man who just watched his own house burn down in front of me."
 
-"I'm told I've had a very educational week." A faint, real almost-smile. "Turns out I learn fast."`,
+"I'm told I've had a very educational week." A faint, entirely real almost-smile breaks through the exhaustion carved into his face. "Turns out I learn rather fast, under sufficient pressure and a well-aimed ward."
+
+You spend a long moment simply looking at each other across the wreckage of ledgers and old certainties, the tether between you finally, mercifully slack. Neither of you reaches to close the remaining distance. Neither of you steps further away either.
+
+"For what it's worth," he adds, quieter now, "I'm glad it was you who caught me tonight, and not someone with considerably less patience for the truth."
+
+"Give it time," you say. "My patience has limits too."
+
+"I'm counting on finding out exactly where."`,
       ending: true,
       tag: "Ending: Reckoning"
     },
@@ -273,21 +328,21 @@ Afterward, in the wreckage of everything his house is about to lose, he doesn't 
     n6_severance: {
       locked: true,
       chapter: "Six — Severance",
-      text: `Standing over the evidence together, you say only what's necessary. The glyph-key flares — and resists.
+      text: `Standing over the evidence together, you say only what's necessary — careful, guarded, exactly as much truth as you've allowed yourself to speak all night. The glyph-key flares — and resists, refusing to fully unravel.
 
-"It's not enough," he says, understanding it in real time, the exact moment the unraveling stalls. "It has to be everything. You have to mean it completely, or the binding leaves them a way in—"
+"It's not enough," he says, understanding it in real time, the exact moment the unraveling stalls beneath your joined hands. "It has to be everything. You have to mean it completely, or the binding leaves them a way back in—"
 
-The sabotage fights back. Whatever's left of the conspiracy's control finds the gap you left guarded and drives into it. You fight — dragon-blood or not, a mage who nearly took his arm off once doesn't fight any less hard the second time — and between the two of you the immediate threat is beaten back, his house's worst secret exposed regardless.
+The sabotage fights back, hard and sudden. Whatever's left of the conspiracy's control finds the gap your guarded honesty left open and drives straight into it without hesitation. You fight — dragon-blood or not, a mage who nearly took his arm off once doesn't fight any less fiercely the second time around, glyphs sparking wild at your fingertips — and between the two of you the immediate threat is beaten back, his house's worst secret exposed regardless of the cost either of you paid to expose it.
 
-But the binding itself doesn't fully sever. Can't, built as it was on half-truths held at careful arm's length.
+But the binding itself doesn't fully sever. Can't, built as it was on half-truths held at careful, deliberate arm's length from the very start of tonight.
 
-"It'll fade eventually," he says afterward, standing the length of the room away, voice carefully even. "Slowly. Not the clean break it could have been."
+"It'll fade eventually," he says afterward, standing the full length of the room away from you, voice carefully, deliberately even despite the blood on both your hands. "Slowly. Not the clean break it genuinely could have been, if you'd let it be."
 
-"I did what I came here to do. The conspiracy's exposed."
+"I did what I came here to do. The conspiracy's exposed, your house can no longer hide it."
 
-"You did." No accusation in it, which is somehow worse. "That was always going to be enough to win. I think we both know it was never going to be enough for the rest of it."
+"You did." No accusation in it whatsoever, which is somehow considerably worse than if there had been. "That was always going to be enough to win tonight. I think we both already know it was never going to be enough for the rest of it, whatever the rest of it might have become."
 
-No dramatic final argument — just two people who did the necessary thing and left everything else exactly where they found it: unresolved, guarded, chosen with open eyes instead of avoided in the dark.`,
+No dramatic final argument. Just two people who did the necessary thing and left everything else exactly where they found it — unresolved, guarded, chosen with open eyes this time instead of avoided in the dark of a stolen vault.`,
       ending: true,
       tag: "Ending: Severance"
     },
@@ -295,19 +350,23 @@ No dramatic final argument — just two people who did the necessary thing and l
     n6_unbound: {
       locked: true,
       chapter: "Six — Unbound",
-      text: `"No," you say, and it comes out steadier than you expect. "I'm not standing here performing certainty I don't have, not even to save your house. Not even for this."
+      text: `"No," you say, and it comes out steadier than you expect it to, standing over evidence that could unmake you both. "I'm not standing here performing a certainty I don't actually have, not even to save your house from itself. Not even for this."
 
-He doesn't reach for you. Doesn't argue. Just looks at you like he's recalculating something he thought he already understood about how this would end.
+He doesn't reach for you. Doesn't argue. Just looks at you like he's recalculating something he was entirely certain he'd already understood about how tonight would end, and finding the new arithmetic doesn't quite balance.
 
-"Then don't," he says finally. "I'd rather lose my house honestly than win this on a lie you told standing next to me."
+"Then don't," he says finally. "I'd rather lose my house honestly than win it on a lie you told standing next to me over that ledger, whatever the cost of honesty turns out to be."
 
-You walk away before the confrontation plays out fully. The binding holds just enough to keep the worst of the sabotage's immediate danger contained — a temporary reprieve, not a solution, bought by the honesty of your refusal rather than the strength of a bond neither of you finished building. It won't hold forever. You both know it.
+You walk away before the confrontation plays out fully. The binding holds just enough to keep the worst of the sabotage's immediate danger contained — a temporary reprieve, not a genuine solution, bought by the honesty of your refusal rather than the strength of a bond neither of you finished building between you. It won't hold forever. You both know that with uncomfortable, quiet certainty.
 
-At the door, he stops you — not with a hand, just your name, said plainly, no performance left in it.
+At the door, he stops you — not with a hand, just with your name, said plainly, no performance left in it for what might be the first time all night, all week, possibly longer.
 
-"For what it's worth," he says, "I'd rather have this — you, honest, walking away — than a version of you that stayed for the wrong reason."
+"For what it's worth," he says, "I'd rather have this — you, honest, walking away from me — than a version of you that stayed for entirely the wrong reasons, built on a lie neither of us could sustain."
 
-You don't have an answer for that either. You leave anyway, the conspiracy still smoldering behind you, the tether still faintly humming between you both — and for the first time since the tower, nothing unsaid weighing down the road ahead.`,
+You don't have a ready answer for that either. You leave anyway, the conspiracy still smoldering behind you in his house's ledgers, the tether still faintly humming between you both across whatever distance now separates you — and for the first time since the tower, nothing unsaid weighing down the road stretching out ahead of you into the dark.
+
+You don't look back at the grain store, or the lantern still burning low inside it, or the man standing very still in its doorway watching you go. You've learned, the hard way, over three careful years, that looking back is how the past decides it isn't finished with you yet.
+
+The tether will fade eventually. You tell yourself that's the outcome you actually wanted.`,
       ending: true,
       tag: "Ending: Unbound"
     }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AuthGate } from './AuthGate.jsx';
+import { isNativeApp } from '../engine/platform.js';
 
 // Mirrors the server's pricing exactly (see create-checkout-session)
 // so what's displayed always matches what Stripe will actually charge.
@@ -40,6 +41,28 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
     if (isAnonymous) { setWantsToUnlock(true); return; }
     onUnlock();
   };
+
+  // Reader App pattern: no purchase flow inside the native app — price
+  // is informational only, in both the compact and full card variants.
+  if (isNativeApp()) {
+    if (compact) {
+      return (
+        <p style={{ marginTop: 14, fontSize: 12, color: 'var(--ink-dim)', textAlign: 'center' }}>
+          Or unlock {countLabel} for {priceDisplay} at <strong style={{ color: 'var(--ink)' }}>wovenfate.app</strong>
+        </p>
+      );
+    }
+    return (
+      <div className="page" style={{ textAlign: 'center' }}>
+        <p style={{ fontFamily: "'Fraunces', serif", fontSize: 18, marginBottom: 6 }}>{label}</p>
+        <p style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 600, marginBottom: 10 }}>{priceDisplay}</p>
+        <p style={{ fontSize: 13, color: 'var(--ink-dim)', lineHeight: 1.6 }}>
+          To unlock {countLabel}, visit <strong style={{ color: 'var(--ink)' }}>wovenfate.app</strong> in
+          your browser and sign in with the same account.
+        </p>
+      </div>
+    );
+  }
 
   if (isAnonymous && wantsToUnlock) {
     return (

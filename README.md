@@ -838,6 +838,45 @@ still reachable via their original paths (guarded+hold → Severance,
 open-guard+hold → Reckoning, open heart → Surrender, walk away →
 Unbound).
 
+### Reader App pattern for native builds (this session)
+
+**Why:** outside the US, Apple requires digital content purchased inside
+an app to go through Apple's own In-App Purchase system (15–30% cut)
+unless the app has no in-app purchase flow at all — the "Reader App"
+exemption Kindle, Netflix, and Spotify's traditional apps use. Building
+full native IAP (StoreKit + Google Play Billing, with separate
+server-side receipt validation for each) would have been a significant
+additional project. This avoids that entirely.
+
+**What changed:** on native builds only (`Capacitor.isNativePlatform()`
+— see `src/engine/platform.js`), the paywall and bundle promo show
+price information but **no tappable purchase button or link at all** —
+just plain text pointing to wovenfate.app. This is the most
+conservative interpretation, deliberately avoiding even the
+"external link" gray area (which has its own entitlement requirements
+outside the US and has seen inconsistent enforcement). The web/PWA
+version is completely unaffected — full Stripe checkout flow, exactly
+as before.
+
+**How a reader actually buys on native:** they read the informational
+text, open wovenfate.app in their own browser, sign into the same
+account, purchase there. Next time they view that title in the native
+app, it shows unlocked automatically — no special handling needed,
+since ownership is tied to the account, not the device or app.
+
+**Files touched:** `Paywall.jsx`, `BundlePromo.jsx` (both variants),
+new `src/engine/platform.js`. No changes to `App.jsx`, no new
+dependencies — `@capacitor/core` was already in `package.json` from
+the earlier native-wrapper groundwork.
+
+**To verify:** this can only be properly tested once the native build
+actually exists (`npx cap add ios/android`, still your step to run
+locally) — in a regular browser, `isNativeApp()` always returns false,
+so the web/PWA purchase flow should look completely unchanged. Once
+you have a native build running, confirm the paywall shows price +
+informational text with no button, while the web version still works
+exactly as before.
+
 ### Deploy to Vercel
 
 1. Push this project to a GitHub repo.

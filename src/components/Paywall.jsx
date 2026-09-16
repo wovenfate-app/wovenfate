@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AuthGate } from './AuthGate.jsx';
+import { isNativeApp } from '../engine/platform.js';
 
 export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error }) {
   const [wantsToUnlock, setWantsToUnlock] = useState(false);
@@ -28,7 +29,22 @@ export function Paywall({ title, titleId, isAnonymous, onUnlock, loading, error 
         {title.name} continues past this point — four endings, your path to choose.
       </p>
 
-      {isAnonymous && wantsToUnlock ? (
+      {isNativeApp() ? (
+        // Reader App pattern: no purchase flow at all inside the native
+        // app — price is informational only. Buying happens on the
+        // website, in the reader's own browser, then the unlock follows
+        // automatically once they're signed into the same account here.
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}>
+          <p style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, marginBottom: 8 }}>
+            {priceDisplay}
+          </p>
+          <p style={{ fontSize: 13, color: 'var(--ink-dim)', lineHeight: 1.6 }}>
+            To unlock this title, visit <strong style={{ color: 'var(--ink)' }}>wovenfate.app</strong> in
+            your browser and sign in with the same account. Once purchased,
+            it unlocks here automatically.
+          </p>
+        </div>
+      ) : isAnonymous && wantsToUnlock ? (
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}>
           <AuthGate
             heading="Create a free account to continue"
