@@ -100,6 +100,14 @@ test('humanizeForSpeech fuses a vowel into vowel-less invented sounds so it is n
   assert.match(result, /[aeiouAEIOU]/);
 });
 
+test('humanizeForSpeech dedupes repeated letters before fusing a vowel, so the cluster stays short', () => {
+  // "shhhk" collapses to "shhk" (3+ repeat rule), then fully dedupes to
+  // "shk" before the vowel goes in — landing on "shuk", not a stretched
+  // "shhuk", since weaker engines still spell out an unusual double-letter
+  // cluster even after one vowel is added.
+  assert.equal(humanizeForSpeech('shhhk'), 'shuk');
+});
+
 test('humanizeForSpeech leaves known interjections and ordinary prose alone', () => {
   assert.equal(humanizeForSpeech('shh, listen.'), 'shh, listen.');
   assert.equal(humanizeForSpeech('Choose how the story unfolds.'), 'Choose how the story unfolds.');

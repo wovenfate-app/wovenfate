@@ -177,8 +177,16 @@ function fixToken(word) {
   // "sshhk". Fusing a vowel in before the last consonant gives it one
   // pronounceable syllable instead. It won't be phonetically exact, but a
   // single blended sound reads far better than five spelled-out letters.
-  if (!/[aeiouAEIOU]/.test(collapsed) && collapsed.length >= 3) {
-    return lead + collapsed.slice(0, -1) + 'u' + collapsed.slice(-1) + trail;
+  if (!/[aeiouAEIOU]/.test(collapsed)) {
+    // Weaker engines (notably Windows/Edge SAPI voices) still spell out a
+    // stretched cluster like "shhuk" — the doubled "hh" reads as unusual
+    // as the original. Fully deduping repeats first ("sshhk" -> "shk")
+    // before inserting the vowel lands on a short, ordinary-looking
+    // cluster ("shuk") that's far more likely to get treated as one
+    // syllable across engines, not just the more permissive ones.
+    const deduped = collapsed.replace(/(.)\1+/g, '$1');
+    const base = deduped.length >= 2 ? deduped : collapsed;
+    return lead + base.slice(0, -1) + 'u' + base.slice(-1) + trail;
   }
   return lead + collapsed + trail;
 }
