@@ -93,6 +93,14 @@
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: linear-gradient(90deg, var(--ember), transparent 70%);
   }
+  /* Reading-flow elements (chapter pages, forms, the pricing card) stay
+     capped to a comfortable line length and centered even once
+     .app-content widens for desktop below — only the hero and catalog
+     grid are meant to use the full wide column. A no-op on phone
+     widths, since .app-content is already narrower than this. */
+  .page, .narrator {
+    max-width: 640px; margin-left: auto; margin-right: auto;
+  }
 
   /* Page-turn transition — triggered by giving the wrapper a new `key`
      per node in ChapterView, so React remounts it and the animation
@@ -192,6 +200,7 @@
   .catalog-section-title {
     font-family: 'Fraunces', serif; font-size: 17px; margin: 0 0 12px; padding: 0 2px;
   }
+  .hscroll-row { position: relative; }
   .hscroll {
     display: flex; gap: 14px; overflow-x: auto;
     padding: 2px 2px 10px; margin: 0 -2px;
@@ -199,13 +208,29 @@
     -webkit-overflow-scrolling: touch;
   }
   .hscroll::-webkit-scrollbar { display: none; }
+  /* Prev/next buttons for the hidden-scrollbar carousel — vertically
+     centered on the 158px cover row, shown only when HScrollRow
+     determines there's actually somewhere further to scroll. */
+  .hscroll-nav {
+    position: absolute; top: 63px; z-index: 2;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(23, 20, 31, 0.85); border: 1px solid var(--border);
+    color: var(--ink); font-size: 18px; line-height: 1; cursor: pointer;
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    transition: background .15s, transform .1s;
+  }
+  .hscroll-nav:hover { background: var(--surface-raised); }
+  .hscroll-nav:active { transform: scale(0.92); }
+  .hscroll-nav-left { left: -6px; }
+  .hscroll-nav-right { right: -6px; }
   .hscroll-card {
     flex: 0 0 auto; width: 158px; scroll-snap-align: start;
     cursor: pointer; background: none; border: none; padding: 0; text-align: left;
     color: inherit; font-family: inherit;
   }
   .hscroll-cover {
-    width: 158px; aspect-ratio: 2 / 3; border-radius: 12px; overflow: hidden;
+    width: 158px; height: 158px; border-radius: 12px; overflow: hidden;
     position: relative; margin-bottom: 8px;
     border: 1px solid var(--border);
     box-shadow: 0 6px 18px rgba(0,0,0,0.3);
@@ -226,4 +251,34 @@
   }
   .hscroll-meta {
     font-size: 11px; color: var(--ink-dim); margin: 0;
+  }
+
+  /* Desktop layout — phone/tablet styles above are untouched below this
+     breakpoint. The app-shell (header + content) widens, the hero and
+     catalog rows use that extra width, and the reading-flow elements
+     (.page, .narrator, capped further up) stay at a comfortable line
+     length instead of stretching edge to edge.
+     The catalog row switches from a horizontal-scroll carousel to a
+     wrapping shelf: at this width all 5 covers fit without scrolling,
+     so HScrollRow's own scroll-affordance check naturally hides the
+     prev/next buttons here — no component change needed. */
+  @media (min-width: 880px) {
+    .app-header-inner { max-width: 1080px; }
+    .app-content {
+      max-width: 1080px;
+      padding-left: 40px; padding-right: 40px;
+    }
+    .hero {
+      margin-left: -40px; margin-right: -40px;
+      height: 360px;
+    }
+    .hero-content { padding: 0 40px 36px; }
+    .hero-headline { font-size: 40px; max-width: 520px; }
+    .hero-sub { font-size: 15px; }
+    .catalog-section-title { font-size: 19px; }
+    .hscroll {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      scroll-snap-type: none;
+    }
   }
