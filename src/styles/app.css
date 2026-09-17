@@ -252,6 +252,14 @@
   .hscroll-title {
     font-family: 'Fraunces', serif; font-size: 14px; line-height: 1.3;
     margin: 0 0 3px;
+    /* Reserve room for 2 lines regardless of actual length, so a
+       longer title (e.g. "Court of Salt and Drowning") wrapping to a
+       second line doesn't make that one card taller than its
+       siblings and throw off the row. Any title beyond 2 lines gets
+       truncated with an ellipsis rather than growing further. */
+    min-height: 36px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .hscroll-meta {
     font-size: 11px; color: var(--ink-dim); margin: 0;
