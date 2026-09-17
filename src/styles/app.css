@@ -34,20 +34,42 @@
     border-bottom: 1px solid var(--border);
   }
   .app-header-inner {
+    position: relative;
     max-width: 600px; margin: 0 auto; height: var(--header-height);
-    display: flex; align-items: center; padding: 0 12px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
   }
   .app-header-back {
-    background: none; border: none; color: var(--ink);
+    background: none; border: none; margin: 0; padding: 0; color: var(--ink);
     display: flex; align-items: center; justify-content: center;
     width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
     transition: background .15s;
   }
   .app-header-back:active { background: var(--surface-raised); transform: scale(0.92); }
   .app-header-spacer { width: 36px; flex-shrink: 0; }
+  /* Account icon (+ its "Sign in" label, see .app-header-account-label)
+     sits in the same flex row as the back/spacer slot, but doesn't need
+     to match its 36px width now that the title below is centered
+     independently of both side columns. */
+  .app-header-account {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    flex-shrink: 0;
+  }
+  .app-header-account-label {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.02em; color: var(--ember);
+    white-space: nowrap;
+  }
+  /* Absolutely centered on the header bar itself, rather than distributed
+     via flex between the two side columns — that way the logo's position
+     never depends on the back/spacer/account slots happening to be the
+     same width as each other (e.g. once the account column grew a "Sign
+     in" label under it). max-width keeps a long chapter title from
+     overlapping either side button. */
   .app-header-titles {
-    flex: 1; text-align: center; overflow: hidden;
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    max-width: calc(100% - 104px);
+    text-align: center; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
+    pointer-events: none;
   }
   .app-header-title {
     font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600;
