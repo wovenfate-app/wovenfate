@@ -47,7 +47,7 @@ export async function fetchCatalog() {
   // first) at the front, matching its place as the flagship title.
   const { data, error } = await supabase
     .from('titles')
-    .select('id, name, tagline, cover_image_url, price_cents')
+    .select('id, name, tagline, cover_image_url, price_cents, heat_level')
     .eq('is_published', true)
     .order('created_at', { ascending: true });
   if (error) throw error;

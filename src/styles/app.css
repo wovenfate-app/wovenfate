@@ -102,6 +102,31 @@
     max-width: 640px; margin-left: auto; margin-right: auto;
   }
 
+  /* Title cover page — shown once between picking a title and actually
+     entering it. */
+  .cover-page { text-align: center; }
+  .cover-page-art {
+    width: 220px; margin: 0 auto 20px; border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--border); box-shadow: 0 10px 34px rgba(0, 0, 0, 0.4);
+  }
+  .cover-page-art img {
+    width: 100%; aspect-ratio: 2 / 3; object-fit: cover; display: block;
+  }
+  .cover-page-heat {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ember);
+    text-transform: uppercase; margin: 0 0 8px;
+  }
+  .cover-page-title {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 26px; margin: 0 0 10px;
+  }
+  .cover-page-tagline {
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 15px;
+    color: var(--ink-dim); line-height: 1.5; margin: 0 auto 18px; max-width: 440px;
+  }
+  .cover-page-meta {
+    font-size: 13px; color: var(--ink-dim); margin: 0 0 18px;
+  }
+
   /* Page-turn transition — triggered by giving the wrapper a new `key`
      per node in ChapterView, so React remounts it and the animation
      replays on every navigation instead of only on first load. */

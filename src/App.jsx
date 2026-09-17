@@ -11,6 +11,7 @@ import { useVoiceChoice } from './engine/useVoiceChoice.js';
 import { usePurchase } from './engine/usePurchase.js';
 import { useBundlePurchase } from './engine/useBundlePurchase.js';
 import { resolveAutoPurchaseAction } from './engine/purchaseRedirect.js';
+import { shouldSkipCoverPage } from './engine/coverGate.js';
 import { ChapterView } from './components/ChapterView.jsx';
 import { ChoiceList } from './components/ChoiceList.jsx';
 import { EndingModal } from './components/EndingModal.jsx';
@@ -18,6 +19,7 @@ import { NarratorBar } from './components/NarratorBar.jsx';
 import { Paywall } from './components/Paywall.jsx';
 import { BundlePromo } from './components/BundlePromo.jsx';
 import { LandingPage, SiteFooter } from './components/LandingPage.jsx';
+import { TitleCoverPage } from './components/TitleCoverPage.jsx';
 import { AppHeader } from './components/AppHeader.jsx';
 import { AccountModal } from './components/AccountModal.jsx';
 import './styles/app.css';
@@ -34,6 +36,18 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     return params.get('title') || null;
   });
+
+  // Picking a title from the landing page shows its cover first — the
+  // title, tagline, and a Start/Continue button — before dropping into
+  // chapter text, like opening a book to its cover page first. Booting
+  // straight into a title from a URL (a post-checkout redirect, a resume
+  // link) skips it, since the reader already chose this book to get here.
+  const [enteredReading, setEnteredReading] = useState(() => shouldSkipCoverPage(window.location.search));
+
+  const handleSelectTitle = useCallback((titleId) => {
+    setSelectedTitleId(titleId);
+    setEnteredReading(false);
+  }, []);
 
   const [catalog, setCatalog] = useState(null);
   const [inProgressIds, setInProgressIds] = useState(new Set());
@@ -142,6 +156,7 @@ export default function App() {
   const handleBackToLanding = useCallback(() => {
     setSelectedTitleId(null);
     setTitleData(null);
+    setEnteredReading(false);
     // Refresh so a just-finished/just-started title's Start/Continue
     // label is correct if the reader picks a title again this session.
     if (user?.id) {
@@ -188,7 +203,7 @@ export default function App() {
             titles={catalog}
             inProgressIds={inProgressIds}
             purchasedIds={purchasedIds}
-            onSelect={setSelectedTitleId}
+            onSelect={handleSelectTitle}
             isAnonymous={isAnonymous}
           />
           <div className="catalog-section">
@@ -210,6 +225,27 @@ export default function App() {
         {accountModalOpen && (
           <AccountModal isAnonymous={isAnonymous} userEmail={user?.email} onClose={() => setAccountModalOpen(false)} />
         )}
+      </>
+    );
+  }
+
+  // Cover page: shown once after picking a title, before loading its
+  // chapter text. catalogEntry is only missing in freak edge cases
+  // (e.g. a title unpublished mid-session) — fall through to the normal
+  // reading flow rather than getting stuck on a dead end.
+  const catalogEntry = catalog?.find((t) => t.id === selectedTitleId);
+  if (!enteredReading && catalogEntry) {
+    return (
+      <>
+        <AppHeader title={catalogEntry.name} onBack={handleBackToLanding} />
+        <div className="app-content">
+          <TitleCoverPage
+            title={catalogEntry}
+            hasProgress={inProgressIds.has(selectedTitleId)}
+            isPurchased={purchasedIds.has(selectedTitleId)}
+            onEnter={() => setEnteredReading(true)}
+          />
+        </div>
       </>
     );
   }
