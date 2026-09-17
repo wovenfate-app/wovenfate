@@ -170,6 +170,16 @@
   .story-text { font-family: 'Fraunces', serif; font-size: 18px; line-height: 1.7; }
   .story-text p { margin: 0 0 16px; }
   .story-text p:last-child { margin-bottom: 0; }
+  .chapter-italic { font-style: italic; }
+  /* The word currently being read aloud (see useNarration's onboundary
+     handling) — a soft wash rather than a hard box, since it moves
+     roughly word-by-word and shouldn't fight for attention with the
+     prose itself. */
+  .narration-highlight {
+    background: var(--ember-soft); border-radius: 3px;
+    box-shadow: 0 0 0 2px var(--ember-soft);
+    transition: background-color .1s ease;
+  }
   .choices { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
   .choice-btn {
     text-align: left; background: var(--surface-raised);

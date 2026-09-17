@@ -416,6 +416,10 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
   // navigation to a new chapter should always start that chapter fresh.
   const hasUsedResumePositionRef = useRef(false);
 
+  // The word currently being read aloud, passed to ChapterView to
+  // highlight — null whenever nothing is playing or between segments.
+  const [spokenWord, setSpokenWord] = useState(null);
+
   const speakCurrentNode = useCallback(() => {
     const positionKey = `${title.id}:${currentNodeId}`;
     const startIndex = hasUsedResumePositionRef.current ? 0 : getSavedPosition(positionKey);
@@ -430,6 +434,7 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
       {
         startIndex,
         onSegmentStart: (i) => saveSavedPosition(positionKey, i),
+        onWordBoundary: setSpokenWord,
       }
     );
   }, [narration, currentNode, currentNodeId, title.id, maybeListen]);
@@ -502,7 +507,7 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
             </>
           ) : (
             <div className="page page-transition" key={currentNode.chapter}>
-              <ChapterView node={currentNode} />
+              <ChapterView node={currentNode} spokenWord={spokenWord} />
               <ChoiceList node={currentNode} onChoose={trackedChoose} onRestart={restart} />
             </div>
           )}

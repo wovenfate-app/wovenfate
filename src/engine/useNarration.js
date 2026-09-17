@@ -1,50 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { segmentNode, tokenizeWords, humanizeForSpeech } from './textSegments.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
 
 /**
- * Splits a chapter's text into narrator / her / his segments by pulling out
- * quoted dialogue and guessing the speaker from nearby pronouns.
- *
- * This is a heuristic, not authored speaker-tagging — it works well given
- * how consistently the prose attributes dialogue ("you say" / "he says"),
- * but an unusual sentence could occasionally misfire. The real fix, once
- * content moves to Supabase, is tagging speaker per line at authoring time
- * rather than guessing it at read time — worth doing before this scales
- * past the flagship title.
+ * The full speech queue for a node: every prose segment (shared with
+ * ChapterView via segmentNode, so what's highlighted always matches what's
+ * spoken) plus, at the end, the "what do you choose?" prompt for its
+ * choices — spoken, but never shown as chapter prose, so it's added here
+ * rather than baked into segmentNode itself.
  */
-function segmentNode(node) {
-  const segments = [];
-  const paragraphs = node.text.trim().split('\n\n');
-
-  paragraphs.forEach((para) => {
-    const clean = para.replace(/\*/g, '');
-    const quoteRegex = /"([^"]+)"/g;
-    let lastIndex = 0;
-    let match;
-    while ((match = quoteRegex.exec(clean)) !== null) {
-      const before = clean.slice(lastIndex, match.index);
-      if (before.trim()) segments.push({ speaker: 'narrator', text: before });
-
-      const after = clean.slice(match.index + match[0].length, match.index + match[0].length + 80).toLowerCase();
-      const beforeCtx = clean.slice(Math.max(0, match.index - 80), match.index).toLowerCase();
-      const ctx = after + ' ' + beforeCtx;
-      const hasHe = /\b(he|his|him)\b/.test(ctx);
-      const hasYou = /\b(you|your)\b/.test(ctx);
-      const speaker = hasHe && !hasYou ? 'his' : hasYou && !hasHe ? 'her' : hasHe ? 'his' : 'her';
-
-      segments.push({ speaker, text: match[1] });
-      lastIndex = match.index + match[0].length;
-    }
-    const rest = clean.slice(lastIndex);
-    if (rest.trim()) segments.push({ speaker: 'narrator', text: rest });
-  });
-
+function buildSpeechQueue(node) {
+  const queue = segmentNode(node).flat.slice();
   if (node.choices && node.choices.length) {
     const options = node.choices.map((c) => c.label).join('. Or, ');
-    segments.push({ speaker: 'narrator', text: `What do you choose? ${options}.` });
+    queue.push({ speaker: 'narrator', text: `What do you choose? ${options}.` });
   }
-  return segments;
+  return queue;
 }
 
 export function useNarration() {
@@ -100,21 +72,48 @@ export function useNarration() {
 
   const indexRef = useRef(0);
   const onSegmentStartRef = useRef(null);
+  const onWordBoundaryRef = useRef(null);
+  const wordRangesRef = useRef([]);
+  const wordCounterRef = useRef(0);
 
   const speakNext = useCallback(() => {
     if (!queueRef.current.length) {
       setIsSpeaking(false);
+      if (onWordBoundaryRef.current) onWordBoundaryRef.current(null);
       if (onQueueEmptyRef.current) onQueueEmptyRef.current();
       return;
     }
-    if (onSegmentStartRef.current) onSegmentStartRef.current(indexRef.current);
+    const segIndex = indexRef.current;
+    if (onSegmentStartRef.current) onSegmentStartRef.current(segIndex);
+    if (onWordBoundaryRef.current) onWordBoundaryRef.current(null); // clear the previous segment's highlight
     const seg = queueRef.current.shift();
     indexRef.current += 1;
-    const utter = new SpeechSynthesisUtterance(seg.text.replace(/\n+/g, ' ').trim());
+
+    // Word ranges are computed from the untouched, on-screen text (what
+    // ChapterView renders) — humanizeForSpeech only ever adjusts letters
+    // within a word, never the word count, so "the Nth word boundary
+    // event" reliably maps back to "the Nth range here" regardless of any
+    // pronunciation tweaks applied to what's actually spoken below.
+    wordRangesRef.current = tokenizeWords(seg.text);
+    wordCounterRef.current = 0;
+
+    const utter = new SpeechSynthesisUtterance(humanizeForSpeech(seg.text.replace(/\n+/g, ' ').trim()));
     const { voice, pitch, rate } = voiceAndPitchFor(seg.speaker);
     if (voice) utter.voice = voice;
     utter.pitch = pitch;
     utter.rate = rate;
+    utter.onboundary = (event) => {
+      // Some engines also fire sentence-level boundaries; only word ticks
+      // should advance the highlight. A missing event.name (some browsers
+      // don't send one) is treated as a word tick — the permissive
+      // default — since that's what those browsers exclusively fire.
+      if (event.name && event.name !== 'word') return;
+      const range = wordRangesRef.current[wordCounterRef.current];
+      wordCounterRef.current += 1;
+      if (range && onWordBoundaryRef.current) {
+        onWordBoundaryRef.current({ segmentIndex: segIndex, charIndex: range.start, charEnd: range.end });
+      }
+    };
     utter.onend = speakNext;
     utter.onerror = (event) => {
       // synth.cancel() (called by stop(), or by speakNode() starting a
@@ -136,14 +135,18 @@ export function useNarration() {
    * already been listening to in a previous session (see
    * useNarrationPosition). `onSegmentStart(index)` fires right before
    * each segment plays, so the caller can persist "how far we got" as
-   * we go, not just at the end.
+   * we go, not just at the end. `onWordBoundary(range | null)` fires as
+   * each word starts (browser support permitting — see NarratorBar's
+   * caveat), and with `null` whenever nothing should currently be
+   * highlighted (segment change, pause-worthy stop, or queue end).
    */
-  const speakNode = useCallback((node, onDone, { startIndex = 0, onSegmentStart = null } = {}) => {
+  const speakNode = useCallback((node, onDone, { startIndex = 0, onSegmentStart = null, onWordBoundary = null } = {}) => {
     if (!synth) return;
     synth.cancel();
-    queueRef.current = segmentNode(node).slice(startIndex);
+    queueRef.current = buildSpeechQueue(node).slice(startIndex);
     indexRef.current = startIndex;
     onSegmentStartRef.current = onSegmentStart;
+    onWordBoundaryRef.current = onWordBoundary;
     onQueueEmptyRef.current = onDone || null;
     setIsSpeaking(true);
     setIsPaused(false);
@@ -155,6 +158,7 @@ export function useNarration() {
     queueRef.current = [];
     setIsSpeaking(false);
     setIsPaused(false);
+    if (onWordBoundaryRef.current) onWordBoundaryRef.current(null);
   }, []);
 
   const pause = useCallback(() => {
