@@ -32,8 +32,8 @@ export function AccountModal({ isAnonymous, userEmail, onClose }) {
           </div>
         ) : (
           <AuthGate
-            heading="Save your account"
-            description="Reading on another device, or want to make sure a purchase is never lost? Add an email — no password needed, and nothing about how you read changes."
+            heading="Sign in or save your account"
+            description="Enter your email — if you already have an account we'll sign you in, otherwise we'll create one so your progress and purchases follow you to any device. No password needed."
             redirectPath={window.location.pathname + window.location.search}
           />
         )}

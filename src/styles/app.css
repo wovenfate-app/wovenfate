@@ -47,11 +47,20 @@
   .app-header-spacer { width: 36px; flex-shrink: 0; }
   .app-header-titles {
     flex: 1; text-align: center; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
   .app-header-title {
     font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* Home-screen brand mark — the knot icon plus the live "Wovenfate" text,
+     rather than a raster wordmark, so the name stays crisp at header size
+     and matches the Fraunces heading font used everywhere else. */
+  .app-header-brand {
+    display: inline-flex; align-items: center; gap: 7px; max-width: 100%;
+  }
+  .app-header-logo {
+    width: 26px; height: 26px; object-fit: contain; flex-shrink: 0;
   }
   .app-header-subtitle {
     font-size: 11px; color: var(--ink-dim); font-style: italic;

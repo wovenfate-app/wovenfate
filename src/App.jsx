@@ -168,7 +168,7 @@ export default function App() {
   if (loadError) {
     return (
       <>
-        <AppHeader title="Wovenfate" onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
+        <AppHeader title="Wovenfate" logo onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
         <div className="app-content">
           <div className="page">
             <p className="story-text">
@@ -188,7 +188,7 @@ export default function App() {
     if (!catalog || authLoading) {
       return (
         <>
-          <AppHeader title="Wovenfate" onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
+          <AppHeader title="Wovenfate" logo onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
           <div className="app-content">
             <div className="page"><p className="story-text">Loading…</p></div>
           </div>
@@ -197,14 +197,13 @@ export default function App() {
     }
     return (
       <>
-        <AppHeader title="Wovenfate" onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
+        <AppHeader title="Wovenfate" logo onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
         <div className="app-content">
           <LandingPage
             titles={catalog}
             inProgressIds={inProgressIds}
             purchasedIds={purchasedIds}
             onSelect={handleSelectTitle}
-            isAnonymous={isAnonymous}
           />
           <div className="catalog-section">
             <BundlePromo

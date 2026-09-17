@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { COVER_IMAGES } from '../data/covers.js';
-import { AuthGate } from './AuthGate.jsx';
 import { HScrollRow } from './HScrollRow.jsx';
 
 function CatalogCard({ title, hasProgress, isPurchased, onSelect }) {
@@ -19,8 +17,7 @@ function CatalogCard({ title, hasProgress, isPurchased, onSelect }) {
   );
 }
 
-export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect, isAnonymous }) {
-  const [signInOpen, setSignInOpen] = useState(false);
+export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
   const inProgress = titles.filter((t) => inProgressIds.has(t.id));
   const discover = titles;
 
@@ -41,37 +38,10 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect, isA
         </div>
       </div>
 
-      {isAnonymous && (
-        <div className="catalog-section">
-          {signInOpen ? (
-            <div className="page">
-              <AuthGate
-                heading="Sign in"
-                description="Already have an account? Enter your email and we'll send a link — no password needed."
-                redirectPath="/"
-                compact
-              />
-              <button
-                onClick={() => setSignInOpen(false)}
-                style={{ background: 'none', border: 'none', color: 'var(--ink-dim)', fontSize: 12, textDecoration: 'underline', cursor: 'pointer', marginTop: 12, padding: 0 }}
-              >
-                Never mind
-              </button>
-            </div>
-          ) : (
-            <p style={{ fontSize: 13, color: 'var(--ink-dim)', textAlign: 'center' }}>
-              Have an account?{' '}
-              <button
-                onClick={() => setSignInOpen(true)}
-                style={{ background: 'none', border: 'none', color: 'var(--ink)', fontSize: 13, textDecoration: 'underline', cursor: 'pointer', padding: 0, fontWeight: 600 }}
-              >
-                Sign in
-              </button>
-              {' '}— or just start reading below as a guest.
-            </p>
-          )}
-        </div>
-      )}
+      {/* Sign in / save your account now lives in the header (the account
+          icon button next to the title, see AppHeader + AccountModal) —
+          it no longer needs its own block floating between the hero and
+          the catalog rows. */}
 
       {inProgress.length > 0 && (
         <div className="catalog-section">

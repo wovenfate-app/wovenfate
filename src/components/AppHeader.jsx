@@ -1,4 +1,4 @@
-export function AppHeader({ onBack, title, subtitle, onAccountClick, accountLinked }) {
+export function AppHeader({ onBack, title, subtitle, onAccountClick, accountLinked, logo }) {
   return (
     <header className="app-header">
       <div className="app-header-inner">
@@ -12,7 +12,14 @@ export function AppHeader({ onBack, title, subtitle, onAccountClick, accountLink
           <span className="app-header-spacer" />
         )}
         <div className="app-header-titles">
-          <span className="app-header-title">{title}</span>
+          {logo ? (
+            <span className="app-header-brand">
+              <img src="/wovenfate-icon.png" alt="" className="app-header-logo" />
+              <span className="app-header-title">{title}</span>
+            </span>
+          ) : (
+            <span className="app-header-title">{title}</span>
+          )}
           {subtitle && <span className="app-header-subtitle">{subtitle}</span>}
         </div>
         {onAccountClick ? (
