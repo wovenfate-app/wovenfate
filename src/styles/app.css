@@ -209,10 +209,11 @@
   }
   .hscroll::-webkit-scrollbar { display: none; }
   /* Prev/next buttons for the hidden-scrollbar carousel — vertically
-     centered on the 158px cover row, shown only when HScrollRow
-     determines there's actually somewhere further to scroll. */
+     centered on the 237px cover row (158x237, matching the 2:3 poster
+     art below), shown only when HScrollRow determines there's
+     actually somewhere further to scroll. */
   .hscroll-nav {
-    position: absolute; top: 63px; z-index: 2;
+    position: absolute; top: 103px; z-index: 2;
     width: 32px; height: 32px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     background: rgba(23, 20, 31, 0.85); border: 1px solid var(--border);
@@ -230,7 +231,10 @@
     color: inherit; font-family: inherit;
   }
   .hscroll-cover {
-    width: 158px; height: 158px; border-radius: 12px; overflow: hidden;
+    /* 2:3 poster ratio, matching the cover art — object-fit: cover on
+       a square box would crop the title lettering baked into the top
+       of the image. */
+    width: 158px; height: 237px; border-radius: 12px; overflow: hidden;
     position: relative; margin-bottom: 8px;
     border: 1px solid var(--border);
     box-shadow: 0 6px 18px rgba(0,0,0,0.3);

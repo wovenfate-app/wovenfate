@@ -40,10 +40,16 @@ export async function fetchTitle(titleId) {
 }
 
 export async function fetchCatalog() {
+  // Without an explicit order, Postgres returns rows in whatever
+  // physical order they happen to sit in — not guaranteed stable, and
+  // not necessarily insertion order either. Ordering by created_at
+  // keeps the catalog deterministic and puts Ember Court (created
+  // first) at the front, matching its place as the flagship title.
   const { data, error } = await supabase
     .from('titles')
     .select('id, name, tagline, cover_image_url, price_cents')
-    .eq('is_published', true);
+    .eq('is_published', true)
+    .order('created_at', { ascending: true });
   if (error) throw error;
   return data;
 }

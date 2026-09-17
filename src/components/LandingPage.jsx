@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { COVER_IMAGES } from '../data/covers.js';
 import { AuthGate } from './AuthGate.jsx';
+import { HScrollRow } from './HScrollRow.jsx';
 
 function CatalogCard({ title, hasProgress, isPurchased, onSelect }) {
   const cover = COVER_IMAGES[title.id];
@@ -75,11 +76,11 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect, isA
       {inProgress.length > 0 && (
         <div className="catalog-section">
           <h2 className="catalog-section-title">Continue Reading</h2>
-          <div className="hscroll">
+          <HScrollRow ariaLabel="Continue reading">
             {inProgress.map((title) => (
               <CatalogCard key={title.id} title={title} hasProgress isPurchased={purchasedIds.has(title.id)} onSelect={onSelect} />
             ))}
-          </div>
+          </HScrollRow>
         </div>
       )}
 
@@ -87,7 +88,7 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect, isA
         <h2 className="catalog-section-title">
           {inProgress.length > 0 ? 'All Stories' : 'Discover'}
         </h2>
-        <div className="hscroll">
+        <HScrollRow ariaLabel={inProgress.length > 0 ? 'All stories' : 'Discover'}>
           {discover.map((title) => (
             <CatalogCard
               key={title.id}
@@ -97,7 +98,7 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect, isA
               onSelect={onSelect}
             />
           ))}
-        </div>
+        </HScrollRow>
       </div>
     </div>
   );
