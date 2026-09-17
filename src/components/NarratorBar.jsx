@@ -6,7 +6,7 @@ export function NarratorBar({
   handsFree, setHandsFree,
   onPlayPause, playLabel,
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const { voices, narratorVoice, setNarratorVoice, herVoice, setHerVoice, hisVoice, setHisVoice, supported } = narration;
 
   const renderSelect = (label, value, onChange) => (

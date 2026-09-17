@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { segmentNode, tokenizeWords, humanizeForSpeech } from './textSegments.js';
+import { segmentNode, tokenizeWords, wordIndexAtChar, humanizeForSpeech } from './textSegments.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
 
@@ -74,7 +74,7 @@ export function useNarration() {
   const onSegmentStartRef = useRef(null);
   const onWordBoundaryRef = useRef(null);
   const wordRangesRef = useRef([]);
-  const wordCounterRef = useRef(0);
+  const spokenWordRangesRef = useRef([]);
 
   const speakNext = useCallback(() => {
     if (!queueRef.current.length) {
@@ -90,14 +90,22 @@ export function useNarration() {
     indexRef.current += 1;
 
     // Word ranges are computed from the untouched, on-screen text (what
-    // ChapterView renders) — humanizeForSpeech only ever adjusts letters
-    // within a word, never the word count, so "the Nth word boundary
-    // event" reliably maps back to "the Nth range here" regardless of any
-    // pronunciation tweaks applied to what's actually spoken below.
+    // ChapterView renders). spokenWordRangesRef is the same tokenization
+    // but over the text actually handed to the utterance below — the two
+    // always have the same word count and order (humanizeForSpeech only
+    // ever adjusts letters within a word), so "the Kth word in what's
+    // spoken" reliably maps to "the Kth range here" regardless of any
+    // pronunciation tweaks. What ties a boundary event to a K, though, is
+    // event.charIndex looked up positionally (wordIndexAtChar) — not a
+    // running count of events — since an engine skipping a boundary for a
+    // bare-punctuation token (an em dash on its own, say) would otherwise
+    // put every highlight after it one word behind for the rest of the
+    // segment.
+    const spokenText = humanizeForSpeech(seg.text.replace(/\n+/g, ' ').trim());
     wordRangesRef.current = tokenizeWords(seg.text);
-    wordCounterRef.current = 0;
+    spokenWordRangesRef.current = tokenizeWords(spokenText);
 
-    const utter = new SpeechSynthesisUtterance(humanizeForSpeech(seg.text.replace(/\n+/g, ' ').trim()));
+    const utter = new SpeechSynthesisUtterance(spokenText);
     const { voice, pitch, rate } = voiceAndPitchFor(seg.speaker);
     if (voice) utter.voice = voice;
     utter.pitch = pitch;
@@ -108,8 +116,8 @@ export function useNarration() {
       // don't send one) is treated as a word tick — the permissive
       // default — since that's what those browsers exclusively fire.
       if (event.name && event.name !== 'word') return;
-      const range = wordRangesRef.current[wordCounterRef.current];
-      wordCounterRef.current += 1;
+      const spokenIdx = wordIndexAtChar(spokenWordRangesRef.current, event.charIndex);
+      const range = spokenIdx >= 0 ? wordRangesRef.current[spokenIdx] : null;
       if (range && onWordBoundaryRef.current) {
         onWordBoundaryRef.current({ segmentIndex: segIndex, charIndex: range.start, charEnd: range.end });
       }

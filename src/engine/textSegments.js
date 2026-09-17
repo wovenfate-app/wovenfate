@@ -107,9 +107,9 @@ export function segmentNode(node) {
 
 /**
  * Every whitespace-delimited word's [start, end) range within `text`, in
- * order. Used to map "the Nth word the speech engine just started" (a
- * simple count, see useNarration) back to a highlightable range in the
- * text actually on screen.
+ * order. Paired with wordIndexAtChar (below), lets useNarration map "the
+ * speech engine just started a word at character N of what it's actually
+ * speaking" back to a highlightable range in the text on screen.
  */
 export function tokenizeWords(text) {
   const ranges = [];
@@ -119,6 +119,28 @@ export function tokenizeWords(text) {
     ranges.push({ start: m.index, end: m.index + m[0].length });
   }
   return ranges;
+}
+
+/**
+ * Finds which word range a character position falls in (or the nearest
+ * one after it). `ranges` must be sorted ascending, as tokenizeWords
+ * produces them.
+ *
+ * This exists because speech engines are not reliable about firing a
+ * 'word' boundary event for every whitespace-delimited token — a bare
+ * punctuation token like an em dash ("thin — a dying") is commonly
+ * skipped entirely. Counting boundary events 1:1 against a pre-tokenized
+ * word list breaks the moment one is skipped: every highlight after that
+ * point silently lands one word behind the audio for the rest of the
+ * segment. Looking a charIndex up positionally instead means a skipped
+ * token just never gets highlighted — it can't throw off any word after
+ * it, because nothing is being counted.
+ */
+export function wordIndexAtChar(ranges, charIndex) {
+  for (let i = 0; i < ranges.length; i += 1) {
+    if (charIndex < ranges[i].end) return i;
+  }
+  return ranges.length ? ranges.length - 1 : -1;
 }
 
 /**

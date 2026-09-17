@@ -5,6 +5,7 @@ import {
   segmentParagraph,
   segmentNode,
   tokenizeWords,
+  wordIndexAtChar,
   buildTextRuns,
   humanizeForSpeech,
 } from './textSegments.js';
@@ -66,6 +67,38 @@ test('tokenizeWords finds every whitespace-delimited word with correct offsets',
     { start: 16, end: 23 },
   ]);
   ranges.forEach((r) => assert.ok('Choose  wisely, hunter.'.slice(r.start, r.end).trim().length > 0));
+});
+
+test('wordIndexAtChar finds the word range a char position falls inside', () => {
+  const ranges = tokenizeWords('Choose wisely, hunter.');
+  assert.equal(wordIndexAtChar(ranges, 0), 0); // "Choose"
+  assert.equal(wordIndexAtChar(ranges, 5), 0); // still inside "Choose"
+  assert.equal(wordIndexAtChar(ranges, 8), 1); // "wisely,"
+  assert.equal(wordIndexAtChar(ranges, 16), 2); // "hunter."
+});
+
+test('wordIndexAtChar never desyncs later words when an engine skips a boundary for a bare token', () => {
+  // "thin — a dying": if the speech engine never fires a boundary for the
+  // standalone em dash, a naive running count would treat the next event
+  // (for "a") as if it were the dash, permanently shifting every
+  // highlight after it one word early for the rest of the segment.
+  // Looking each charIndex up positionally sidesteps that: "a" still
+  // resolves to its own correct index regardless of what did or didn't
+  // fire before it.
+  const text = 'thin — a dying vibration';
+  const ranges = tokenizeWords(text);
+  const aIndex = text.indexOf(' a ') + 1;
+  assert.equal(wordIndexAtChar(ranges, aIndex), 2); // ["thin", "—", "a", "dying", "vibration"]
+  assert.equal(text.slice(ranges[2].start, ranges[2].end), 'a');
+});
+
+test('wordIndexAtChar falls back to the last range for a char index past the end', () => {
+  const ranges = tokenizeWords('one two');
+  assert.equal(wordIndexAtChar(ranges, 999), 1);
+});
+
+test('wordIndexAtChar returns -1 for an empty range list', () => {
+  assert.equal(wordIndexAtChar([], 0), -1);
 });
 
 test('buildTextRuns marks a highlighted range without disturbing surrounding text', () => {
