@@ -205,7 +205,7 @@
     color: inherit; font-family: inherit;
   }
   .hscroll-cover {
-    width: 158px; height: 158px; border-radius: 12px; overflow: hidden;
+    width: 158px; aspect-ratio: 2 / 3; border-radius: 12px; overflow: hidden;
     position: relative; margin-bottom: 8px;
     border: 1px solid var(--border);
     box-shadow: 0 6px 18px rgba(0,0,0,0.3);
