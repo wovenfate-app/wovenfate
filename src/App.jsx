@@ -17,7 +17,7 @@ import { EndingModal } from './components/EndingModal.jsx';
 import { NarratorBar } from './components/NarratorBar.jsx';
 import { Paywall } from './components/Paywall.jsx';
 import { BundlePromo } from './components/BundlePromo.jsx';
-import { LandingPage } from './components/LandingPage.jsx';
+import { LandingPage, SiteFooter } from './components/LandingPage.jsx';
 import { AppHeader } from './components/AppHeader.jsx';
 import { AccountModal } from './components/AccountModal.jsx';
 import './styles/app.css';
@@ -205,6 +205,7 @@ export default function App() {
               setWaiting={setBundleWaiting}
             />
           </div>
+          <SiteFooter />
         </div>
         {accountModalOpen && (
           <AccountModal isAnonymous={isAnonymous} userEmail={user?.email} onClose={() => setAccountModalOpen(false)} />
