@@ -1,5 +1,6 @@
 import { COVER_IMAGES } from '../data/covers.js';
 import { HScrollRow } from './HScrollRow.jsx';
+import { InstallBanner } from './InstallBanner.jsx';
 
 function CatalogCard({ title, hasProgress, isPurchased, onSelect }) {
   const cover = COVER_IMAGES[title.id];
@@ -42,6 +43,8 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
           icon button next to the title, see AppHeader + AccountModal) —
           it no longer needs its own block floating between the hero and
           the catalog rows. */}
+
+      <InstallBanner />
 
       {inProgress.length > 0 && (
         <div className="catalog-section">

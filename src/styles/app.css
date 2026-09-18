@@ -264,6 +264,23 @@
     font-size: 13px; color: var(--ink-dim); margin: 0;
   }
 
+  .install-banner {
+    display: flex; align-items: center; gap: 12px; justify-content: space-between;
+    background: #241d2e; border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; margin: 0 0 22px;
+  }
+  .install-banner-text { font-size: 13px; color: var(--ink); line-height: 1.4; }
+  .install-banner-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .install-banner-btn {
+    background: var(--ember); color: var(--bg); border: none; border-radius: 6px;
+    font-size: 13px; font-weight: 600; padding: 7px 14px; cursor: pointer;
+  }
+  .install-banner-btn:hover { filter: brightness(1.08); }
+  .install-banner-dismiss {
+    background: none; border: none; color: var(--ink-dim); font-size: 18px;
+    line-height: 1; cursor: pointer; padding: 4px 6px;
+  }
+
   .catalog-section { margin-bottom: 30px; }
   .catalog-section-title {
     font-family: 'Fraunces', serif; font-size: 17px; margin: 0 0 12px; padding: 0 2px;
