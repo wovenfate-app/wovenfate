@@ -35,7 +35,9 @@ export function InstallBanner() {
                 <ShareIcon />Share
               </button>
             ) : (
-              <strong>Share</strong>
+              <strong className="install-banner-share-static">
+                <ShareIcon />Share
+              </strong>
             )}
             , then <strong>Add to Home Screen</strong> (tap <strong>View More</strong> first if you don't see it).
           </>

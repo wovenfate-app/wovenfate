@@ -23,8 +23,15 @@
   <meta name="twitter:description" content="Choose how the story unfolds. Read the opening free, then unlock the full branching path — new titles, new endings, no subscription." />
   <meta name="twitter:image" content="https://www.wovenfate.app/og-image.png" />
 
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <!-- Filenames carry a version suffix on purpose: iOS caches the
+       home-screen/apple-touch icon very aggressively per URL, so
+       overwriting icon-192.png's content in place is not guaranteed to
+       ever reach a phone that already fetched it once. Bumping the
+       filename (v2, v3, ...) forces every browser/OS to treat it as a
+       new resource and actually re-fetch. Bump this again for any
+       future icon change. -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192-v2.png" />
+  <link rel="apple-touch-icon" href="/icon-192-v2.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">

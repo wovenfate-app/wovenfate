@@ -48,7 +48,7 @@ export async function generateEndingImage({ titleId, titleName, endingTag }) {
 
   // App icon + wordmark, top.
   try {
-    const icon = await loadImage('/icon-512.png');
+    const icon = await loadImage('/icon-512-v2.png');
     const iconSize = 96;
     roundRectPath(ctx, W / 2 - iconSize / 2, 140, iconSize, iconSize, 22);
     ctx.save();

@@ -7,7 +7,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.png', 'icon-512.png'],
+      // Versioned filenames — see the matching comment in index.html.
+      includeAssets: ['icon-192-v2.png', 'icon-512-v2.png'],
       manifest: {
         name: 'Wovenfate',
         short_name: 'Wovenfate',
@@ -19,10 +20,10 @@ export default defineConfig({
         background_color: '#17141f',
         theme_color: '#17141f',
         icons: [
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+          { src: 'icon-192-v2.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icon-192-v2.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon-512-v2.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icon-512-v2.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       }
     })
