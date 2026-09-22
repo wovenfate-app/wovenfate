@@ -1,23 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { segmentNode, tokenizeWords, wordIndexAtChar, humanizeForSpeech } from './textSegments.js';
+import { buildSpeechQueue, tokenizeWords, wordIndexAtChar, humanizeForSpeech } from './textSegments.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
-
-/**
- * The full speech queue for a node: every prose segment (shared with
- * ChapterView via segmentNode, so what's highlighted always matches what's
- * spoken) plus, at the end, the "what do you choose?" prompt for its
- * choices — spoken, but never shown as chapter prose, so it's added here
- * rather than baked into segmentNode itself.
- */
-function buildSpeechQueue(node) {
-  const queue = segmentNode(node).flat.slice();
-  if (node.choices && node.choices.length) {
-    const options = node.choices.map((c) => c.label).join('. Or, ');
-    queue.push({ speaker: 'narrator', text: `What do you choose? ${options}.` });
-  }
-  return queue;
-}
 
 export function useNarration() {
   const [voices, setVoices] = useState([]);
@@ -182,6 +166,7 @@ export function useNarration() {
   }, []);
 
   return {
+    mode: 'speech',
     supported: !!synth,
     voices, narratorVoice, herVoice, hisVoice,
     setNarratorVoice, setHerVoice, setHisVoice,

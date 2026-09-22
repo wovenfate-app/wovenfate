@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 
+export { isMultiVoiceEnabled, withMultiVoiceSetting } from './multiVoicePreference.js';
+
 const STORAGE_KEY = 'wovenfate-narrator-settings';
 
 // Voice choices are saved by name, not index — the same voice can sit

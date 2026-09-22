@@ -4,6 +4,7 @@ import {
   stripEmphasis,
   segmentParagraph,
   segmentNode,
+  buildSpeechQueue,
   tokenizeWords,
   wordIndexAtChar,
   buildTextRuns,
@@ -57,6 +58,37 @@ test('segmentNode does not add a choices prompt (that is the speech queue\'s job
   const { flat } = segmentNode(node);
   assert.equal(flat.length, 1);
   assert.equal(flat[0].text, 'Just prose.');
+});
+
+test('buildSpeechQueue matches segmentNode when a node has no choices', () => {
+  const node = { text: 'Just prose.' };
+  const queue = buildSpeechQueue(node);
+  assert.equal(queue.length, 1);
+  assert.equal(queue[0].text, 'Just prose.');
+});
+
+test('buildSpeechQueue appends a narrator-spoken prompt listing every choice label', () => {
+  const node = {
+    text: 'The door waits.',
+    choices: [{ label: 'Open it' }, { label: 'Walk away' }],
+  };
+  const queue = buildSpeechQueue(node);
+  assert.equal(queue.length, 2); // one prose segment + the prompt
+  const prompt = queue[queue.length - 1];
+  assert.equal(prompt.speaker, 'narrator');
+  assert.equal(prompt.text, 'What do you choose? Open it. Or, Walk away.');
+});
+
+test('buildSpeechQueue is exactly what scripts/generate-narration.mjs must line up with, index for index', () => {
+  // This is the contract narrationManifest.buildAudioQueue relies on:
+  // pre-rendered clip N must correspond to buildSpeechQueue(node)[N],
+  // not to segmentNode(node).flat[N] (which omits the choices prompt).
+  const node = {
+    text: 'He turns. "Wait," he says.',
+    choices: [{ label: 'Stay' }],
+  };
+  const queue = buildSpeechQueue(node);
+  assert.deepEqual(queue.map((s) => s.speaker), ['narrator', 'his', 'narrator', 'narrator']);
 });
 
 test('tokenizeWords finds every whitespace-delimited word with correct offsets', () => {
