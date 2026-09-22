@@ -5,7 +5,8 @@ import { useAnalytics } from './engine/useAnalytics.js';
 import { useReadingProgress } from './engine/useReadingProgress.js';
 import { useStoryEngine } from './engine/useStoryEngine.js';
 import { useNarration } from './engine/useNarration.js';
-import { useNarratorSettings } from './engine/useNarratorSettings.js';
+import { useAudioNarration } from './engine/useAudioNarration.js';
+import { useNarratorSettings, isMultiVoiceEnabled, withMultiVoiceSetting } from './engine/useNarratorSettings.js';
 import { getSavedPosition, saveSavedPosition, clearSavedPosition } from './engine/useNarrationPosition.js';
 import { useVoiceChoice } from './engine/useVoiceChoice.js';
 import { usePurchase } from './engine/usePurchase.js';
@@ -287,9 +288,38 @@ export default function App() {
 
 function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, track, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
   const { currentNode, currentNodeId, choose, restart } = useStoryEngine(story, resumeFrom, onProgressChange);
-  const narration = useNarration();
-  const voiceChoice = useVoiceChoice();
   const [savedSettings, updateSavedSettings] = useNarratorSettings();
+
+  // Per-book "read dialogue in character voices" toggle — only matters
+  // once a title actually has pre-rendered audio (see audioNarration
+  // below); harmless to compute regardless.
+  const multiVoice = isMultiVoiceEnabled(savedSettings, title.id);
+  const setMultiVoice = useCallback((enabled) => {
+    // updateSavedSettings shallow-merges its argument over the previous
+    // settings (see useNarratorSettings) rather than taking an updater
+    // function, so the merged multiVoiceByTitle has to be computed here
+    // from the current savedSettings, same as the autoRead/handsFree
+    // setters above.
+    updateSavedSettings(withMultiVoiceSetting(savedSettings, title.id, enabled));
+  }, [updateSavedSettings, savedSettings, title.id]);
+
+  // Two narration backends are always instantiated — React hooks can't be
+  // called conditionally — and the pre-rendered ElevenLabs audio backend
+  // wins whenever this title actually has audio generated for it
+  // (`available`); otherwise this falls back to the browser's
+  // speechSynthesis voices exactly as before. See useAudioNarration.js.
+  const audioNarration = useAudioNarration(title.id, multiVoice);
+  const browserNarration = useNarration();
+  const narration = audioNarration.available ? audioNarration : browserNarration;
+
+  // Whether this title has real, reader-ready narration at all. There is
+  // deliberately no reader-facing fallback to the browser's robotic
+  // speechSynthesis voices any more — a title without pre-rendered
+  // ElevenLabs audio yet just shows no narration UI, rather than a worse
+  // version of the feature. See useAudioNarration's `available`.
+  const narrationAvailable = audioNarration.available;
+
+  const voiceChoice = useVoiceChoice();
 
   // Restore auto-read/hands-free immediately from storage — these are
   // simple booleans, no need to wait for anything else to load first.
@@ -435,6 +465,7 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
         startIndex,
         onSegmentStart: (i) => saveSavedPosition(positionKey, i),
         onWordBoundary: setSpokenWord,
+        nodeId: currentNodeId, // only used by useAudioNarration, to look the node up in its manifest
       }
     );
   }, [narration, currentNode, currentNodeId, title.id, maybeListen]);
@@ -451,9 +482,9 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
 
   useEffect(() => {
     narration.stop();
-    if (autoRead && !isLockedAndUnpaid) speakCurrentNode();
+    if (narrationAvailable && autoRead && !isLockedAndUnpaid) speakCurrentNode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentNode, isLockedAndUnpaid]);
+  }, [currentNode, isLockedAndUnpaid, narrationAvailable]);
 
   return (
     <>
@@ -466,10 +497,12 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
       />
       <div className="app-content">
         <div className="book">
-          {!isLockedAndUnpaid && (
+          {!isLockedAndUnpaid && narrationAvailable && (
             <NarratorBar
               narration={narration}
               voiceChoice={voiceChoice}
+              multiVoice={multiVoice}
+              setMultiVoice={setMultiVoice}
               autoRead={autoRead}
               setAutoRead={setAutoRead}
               handsFree={handsFree}
