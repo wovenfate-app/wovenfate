@@ -81,7 +81,12 @@ const PLATFORMS = [
 export function SocialLinks() {
   return (
     <div
-      style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 14 }}
+      // Each link's box is its tap target: 36×44 around the 18px glyph,
+      // packed edge to edge so the glyphs keep roughly their old 32px
+      // spacing (flex shrinks them to 32 wide on a 320px screen so all nine
+      // still fit one row). The negative top
+      // margin absorbs the extra height so the footer doesn't grow.
+      style={{ display: 'flex', justifyContent: 'center', margin: '-13px 0 1px' }}
       aria-label="Wovenfate on social media"
     >
       {PLATFORMS.map(({ key, label, href }) => (
@@ -92,7 +97,10 @@ export function SocialLinks() {
           rel="noopener noreferrer"
           aria-label={label}
           title={label}
-          style={{ color: 'var(--ink-dim)', display: 'inline-flex' }}
+          style={{
+            color: 'var(--ink-dim)', display: 'inline-flex',
+            alignItems: 'center', justifyContent: 'center', width: 36, height: 44,
+          }}
         >
           {ICONS[key]}
         </a>
