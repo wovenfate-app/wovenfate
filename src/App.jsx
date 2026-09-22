@@ -48,6 +48,10 @@ export default function App() {
   const handleSelectTitle = useCallback((titleId) => {
     setSelectedTitleId(titleId);
     setEnteredReading(false);
+    // The cover page renders in place of the landing page without a page
+    // load, so it would otherwise inherit however far down the reader had
+    // scrolled to reach this title's card.
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
 
   const [catalog, setCatalog] = useState(null);
