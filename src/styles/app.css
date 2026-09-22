@@ -261,7 +261,7 @@
     margin: 0 0 6px; max-width: 320px;
   }
   .hero-sub {
-    font-size: 13px; color: var(--ink-dim); margin: 0;
+    font-size: 15px; line-height: 1.4; color: var(--ink-dim); margin: 0;
   }
 
   .install-banner {
@@ -381,7 +381,7 @@
     }
     .hero-content { padding: 0 40px 36px; }
     .hero-headline { font-size: 40px; max-width: 520px; }
-    .hero-sub { font-size: 15px; }
+    .hero-sub { font-size: 17px; }
     .catalog-section-title { font-size: 19px; }
     .hscroll {
       flex-wrap: wrap;
