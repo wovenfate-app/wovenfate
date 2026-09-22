@@ -14,7 +14,7 @@ export function AppHeader({ onBack, title, subtitle, onAccountClick, accountLink
         <div className="app-header-titles">
           {logo ? (
             <span className="app-header-brand">
-              <img src="/wovenfate-icon.png" alt="" className="app-header-logo" />
+              <img src="/wovenfate-icon-64.png" alt="" className="app-header-logo" />
               <span className="app-header-title">{title}</span>
             </span>
           ) : (
