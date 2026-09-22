@@ -11,7 +11,7 @@
     --header-height: 56px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html { overscroll-behavior-y: contain; }
+  html { background: var(--bg); overscroll-behavior-y: contain; }
   body {
     margin: 0;
     background: radial-gradient(ellipse 120% 80% at 50% -10%, #241c33 0%, var(--bg) 55%);
