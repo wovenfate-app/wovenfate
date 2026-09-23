@@ -90,8 +90,7 @@ export function AuthGate({ heading, description, redirectPath, compact, crossDev
         ) : (
           <button
             onClick={handleResend}
-            className={compact ? 'narrator-btn' : 'choice-btn'}
-            style={compact ? {} : { fontWeight: 600 }}
+            className={compact ? 'narrator-btn' : 'btn-primary'}
             disabled={resendState === 'sending'}
           >
             {resendState === 'sending' ? 'Sending…' : 'Finish signing in on this device'}
@@ -143,6 +142,8 @@ export function AuthGate({ heading, description, redirectPath, compact, crossDev
         <input
           type="email"
           required
+          aria-label="Email address"
+          autoComplete="email"
           placeholder="your@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -154,8 +155,8 @@ export function AuthGate({ heading, description, redirectPath, compact, crossDev
         />
         <button
           type="submit"
-          className={compact ? 'narrator-btn' : 'choice-btn'}
-          style={compact ? {} : { fontWeight: 600, flex: '1 1 100%' }}
+          className={compact ? 'narrator-btn' : 'btn-primary'}
+          style={compact ? {} : { flex: '1 1 100%' }}
           disabled={status === 'sending'}
         >
           {status === 'sending' ? 'Sending…' : 'Continue'}

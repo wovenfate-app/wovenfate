@@ -12,7 +12,9 @@ import { useVoiceChoice } from './engine/useVoiceChoice.js';
 import { usePurchase } from './engine/usePurchase.js';
 import { useBundlePurchase } from './engine/useBundlePurchase.js';
 import { resolveAutoPurchaseAction } from './engine/purchaseRedirect.js';
-import { shouldSkipCoverPage } from './engine/coverGate.js';
+import { parseRoute, pathFor } from './engine/routes.js';
+import { NotFoundPage } from './components/NotFoundPage.jsx';
+import { BOOK_DETAILS } from './data/bookDetails.js';
 import { ChapterView } from './components/ChapterView.jsx';
 import { ChoiceList } from './components/ChoiceList.jsx';
 import { EndingModal } from './components/EndingModal.jsx';
@@ -30,29 +32,37 @@ export default function App() {
   const { track } = useAnalytics(user?.id);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
 
-  // Which title (if any) is selected. Reading straight from the URL on
-  // first load means a Stripe redirect (?checkout=success&title=...)
-  // drops the reader back into the right book, not the landing page.
-  const [selectedTitleId, setSelectedTitleId] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('title') || null;
-  });
+  // Which screen is showing, kept in step with the URL (see routes.js):
+  // /, /book/:id (the title's cover page) or /read/:id. Reading it from
+  // the URL on first load also covers a Stripe redirect
+  // (?checkout=success&title=...), which drops the reader straight back
+  // into the right book, skipping the cover page.
+  const [route, setRoute] = useState(() => parseRoute(window.location.pathname, window.location.search));
+  const selectedTitleId = route.titleId ?? null;
+  const enteredReading = route.view === 'read';
 
-  // Picking a title from the landing page shows its cover first — the
-  // title, tagline, and a Start/Continue button — before dropping into
-  // chapter text, like opening a book to its cover page first. Booting
-  // straight into a title from a URL (a post-checkout redirect, a resume
-  // link) skips it, since the reader already chose this book to get here.
-  const [enteredReading, setEnteredReading] = useState(() => shouldSkipCoverPage(window.location.search));
+  const navigate = useCallback((next, { replace = false } = {}) => {
+    const path = pathFor(next);
+    if (replace) window.history.replaceState({}, '', path);
+    else window.history.pushState({}, '', path);
+    setRoute(next);
+  }, []);
+
+  // Browser/phone back and forward move between screens instead of
+  // leaving the site.
+  useEffect(() => {
+    const onPopState = () => setRoute(parseRoute(window.location.pathname, window.location.search));
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const handleSelectTitle = useCallback((titleId) => {
-    setSelectedTitleId(titleId);
-    setEnteredReading(false);
+    navigate({ view: 'book', titleId });
     // The cover page renders in place of the landing page without a page
     // load, so it would otherwise inherit however far down the reader had
     // scrolled to reach this title's card.
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, []);
+  }, [navigate]);
 
   const [catalog, setCatalog] = useState(null);
   const [inProgressIds, setInProgressIds] = useState(new Set());
@@ -87,15 +97,19 @@ export default function App() {
     return () => { cancelled = true; };
   }, [user?.id]);
 
-  // Full story text only loads once a title is actually selected.
+  // Full story text only loads once a title is actually selected — and
+  // only once the catalog confirms that title exists, so a mistyped
+  // /book/:id or /read/:id link shows the not-found page instead of a
+  // load error.
+  const selectedTitleExists = !!catalog?.some((t) => t.id === selectedTitleId);
   useEffect(() => {
-    if (!selectedTitleId) { setTitleData(null); return; }
+    if (!selectedTitleId || !selectedTitleExists) { setTitleData(null); return; }
     let cancelled = false;
     fetchTitle(selectedTitleId)
       .then((data) => { if (!cancelled) setTitleData(data); })
       .catch((err) => { if (!cancelled) setLoadError(err); });
     return () => { cancelled = true; };
-  }, [selectedTitleId]);
+  }, [selectedTitleId, selectedTitleExists]);
 
   const { initialProgress, saveProgress } = useReadingProgress(user?.id, selectedTitleId);
   const [singleWaiting, setSingleWaiting] = useState(false);
@@ -159,16 +173,52 @@ export default function App() {
   }, [authLoading, isAnonymous, selectedTitleId, purchase.isUnlocked, bundle.hasFullLibrary]);
 
   const handleBackToLanding = useCallback(() => {
-    setSelectedTitleId(null);
-    setTitleData(null);
-    setEnteredReading(false);
-    // Refresh so a just-finished/just-started title's Start/Continue
-    // label is correct if the reader picks a title again this session.
-    if (user?.id) {
-      fetchInProgressTitleIds(user.id).then(setInProgressIds).catch(() => {});
-      fetchPurchasedTitleIds(user.id).then(setPurchasedIds).catch(() => {});
+    navigate({ view: 'landing' });
+  }, [navigate]);
+
+  // Whenever the landing page comes back into view — via the header's
+  // back button or the browser's — refresh so a just-finished/just-started
+  // title's Start/Continue label is correct if the reader picks a title
+  // again this session.
+  const previousViewRef = useRef(route.view);
+  useEffect(() => {
+    const cameFromTitle = previousViewRef.current !== 'landing';
+    previousViewRef.current = route.view;
+    if (route.view !== 'landing' || !cameFromTitle || !user?.id) return;
+    fetchInProgressTitleIds(user.id).then(setInProgressIds).catch(() => {});
+    fetchPurchasedTitleIds(user.id).then(setPurchasedIds).catch(() => {});
+  }, [route.view, user?.id]);
+
+  // A legacy /?title= arrival (Stripe return, sign-in link) swaps its URL
+  // for the canonical /read/:id once the purchase hooks have finished
+  // reading and stripping their query params — so a refresh or a shared
+  // link from here onward points at the book, not the landing page.
+  useEffect(() => {
+    if (!route.legacy) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('checkout') || params.has('autoPurchase')) return;
+    navigate({ view: 'read', titleId: route.titleId }, { replace: true });
+  });
+
+  // Per-screen document title and description, so each book's page reads
+  // properly in browser tabs, link previews and search results.
+  const catalogEntryForMeta = catalog?.find((t) => t.id === selectedTitleId);
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="description"]');
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (!meta.dataset.default) meta.dataset.default = meta.content;
+    if (catalogEntryForMeta) {
+      document.title = `${catalogEntryForMeta.name} — Interactive Romantasy | Wovenfate`;
+      meta.content = catalogEntryForMeta.tagline || meta.dataset.default;
+      // Reading and the book page are one book as far as search engines
+      // are concerned — both point at the book page.
+      if (canonical) canonical.href = `https://www.wovenfate.app/book/${catalogEntryForMeta.id}`;
+    } else {
+      document.title = route.view === 'notfound' ? 'Page not found | Wovenfate' : 'Wovenfate — Interactive Romantasy Fiction';
+      meta.content = meta.dataset.default;
+      if (canonical) canonical.href = 'https://www.wovenfate.app/';
     }
-  }, [user?.id]);
+  }, [catalogEntryForMeta, route.view]);
 
   if (loadError) {
     return (
@@ -181,6 +231,23 @@ export default function App() {
               connection and try refreshing.
             </p>
           </div>
+        </div>
+        {accountModalOpen && (
+          <AccountModal isAnonymous={isAnonymous} userEmail={user?.email} onClose={() => setAccountModalOpen(false)} />
+        )}
+      </>
+    );
+  }
+
+  // A path that isn't a screen at all, or a /book|/read link to a title id
+  // that doesn't exist (once the catalog has loaded to check against).
+  const unknownTitle = selectedTitleId && catalog && !catalog.some((t) => t.id === selectedTitleId);
+  if (route.view === 'notfound' || unknownTitle) {
+    return (
+      <>
+        <AppHeader title="Wovenfate" logo onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
+        <div className="app-content">
+          <NotFoundPage onHome={handleBackToLanding} />
         </div>
         {accountModalOpen && (
           <AccountModal isAnonymous={isAnonymous} userEmail={user?.email} onClose={() => setAccountModalOpen(false)} />
@@ -241,15 +308,31 @@ export default function App() {
   if (!enteredReading && catalogEntry) {
     return (
       <>
-        <AppHeader title={catalogEntry.name} onBack={handleBackToLanding} />
+        {/* The book's name is the page's own heading, so the header shows
+            the brand here rather than repeating it. */}
+        <AppHeader title="Wovenfate" logo onBack={handleBackToLanding} onAccountClick={() => setAccountModalOpen(true)} accountLinked={!isAnonymous} />
         <div className="app-content">
           <TitleCoverPage
             title={catalogEntry}
             hasProgress={inProgressIds.has(selectedTitleId)}
-            isPurchased={purchasedIds.has(selectedTitleId)}
-            onEnter={() => setEnteredReading(true)}
+            isPurchased={purchasedIds.has(selectedTitleId) || purchase.isUnlocked === true}
+            onEnter={() => navigate({ view: 'read', titleId: selectedTitleId })}
+            unlock={{
+              isAnonymous,
+              onUnlock: () => {
+                track('checkout_started', { titleId: selectedTitleId, payload: { checkout_type: 'single', source: 'book_page' } });
+                purchase.startCheckout();
+              },
+              loading: purchase.checkoutLoading,
+              error: purchase.checkoutError,
+              waiting: singleWaiting,
+              setWaiting: setSingleWaiting,
+            }}
           />
         </div>
+        {accountModalOpen && (
+          <AccountModal isAnonymous={isAnonymous} userEmail={user?.email} onClose={() => setAccountModalOpen(false)} />
+        )}
       </>
     );
   }
@@ -291,7 +374,8 @@ export default function App() {
 }
 
 function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, track, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
-  const { currentNode, currentNodeId, choose, restart } = useStoryEngine(story, resumeFrom, onProgressChange);
+  const { currentNode, currentNodeId, pathTaken, choose, restart } = useStoryEngine(story, resumeFrom, onProgressChange);
+  const details = BOOK_DETAILS[title.id];
   const [savedSettings, updateSavedSettings] = useNarratorSettings();
 
   // Per-book "read dialogue in character voices" toggle — only matters
@@ -517,31 +601,39 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
           )}
 
           {isLockedAndUnpaid ? (
-            <>
-              <Paywall
-                title={title}
-                titleId={title.id}
-                isAnonymous={isAnonymous}
-                onUnlock={trackedStartCheckout}
-                loading={purchase.checkoutLoading}
-                error={purchase.checkoutError}
-                waiting={singleWaiting}
-                setWaiting={setSingleWaiting}
-              />
-              <BundlePromo
-                titles={catalog || []}
-                purchasedIds={purchasedIds}
-                isAnonymous={isAnonymous}
-                hasFullLibrary={bundle.hasFullLibrary}
-                onUnlock={trackedStartBundleCheckoutInReader}
-                loading={bundle.checkoutLoading}
-                error={bundle.checkoutError}
-                redirectPath={`/?title=${title.id}&autoPurchase=bundle`}
-                waiting={bundleWaiting}
-                setWaiting={setBundleWaiting}
-                compact
-              />
-            </>
+            <Paywall
+              title={title}
+              // Each choice made is one chapter finished, so the choices
+              // so far are both the progress count and the last choice.
+              chosenLabel={pathTaken[pathTaken.length - 1]}
+              chaptersRead={pathTaken.length}
+              totalChapters={details?.chapters}
+              endings={details?.endings}
+              isAnonymous={isAnonymous}
+              onUnlock={trackedStartCheckout}
+              loading={purchase.checkoutLoading}
+              error={purchase.checkoutError}
+              waiting={singleWaiting}
+              setWaiting={setSingleWaiting}
+            >
+              {/* Hidden while the single-title account step is open, so
+                  the card shows one flow at a time. */}
+              {!singleWaiting && !bundle.hasFullLibrary && (
+                <BundlePromo
+                  titles={catalog || []}
+                  purchasedIds={purchasedIds}
+                  isAnonymous={isAnonymous}
+                  hasFullLibrary={bundle.hasFullLibrary}
+                  onUnlock={trackedStartBundleCheckoutInReader}
+                  loading={bundle.checkoutLoading}
+                  error={bundle.checkoutError}
+                  redirectPath={`/?title=${title.id}&autoPurchase=bundle`}
+                  waiting={bundleWaiting}
+                  setWaiting={setBundleWaiting}
+                  compact
+                />
+              )}
+            </Paywall>
           ) : (
             <div className="page page-transition" key={currentNode.chapter}>
               <ChapterView node={currentNode} spokenWord={spokenWord} />

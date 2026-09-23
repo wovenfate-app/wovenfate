@@ -3,14 +3,18 @@ import { HScrollRow } from './HScrollRow.jsx';
 import { InstallBanner } from './InstallBanner.jsx';
 import { SocialLinks } from './SocialLinks.jsx';
 
-function CatalogCard({ title, hasProgress, isPurchased, onSelect }) {
+function CatalogCard({ title, hasProgress, isPurchased, onSelect, lazy }) {
   const cover = COVER_IMAGES[title.id];
   const priceDisplay = title.price_cents ? `£${(title.price_cents / 100).toFixed(2)}` : '';
   const metaText = isPurchased ? 'Purchased' : hasProgress ? 'In progress' : `Free start · ${priceDisplay}`;
   return (
     <button className="hscroll-card" onClick={() => onSelect(title.id)}>
       <div className="hscroll-cover">
-        {cover && <img src={cover} alt="" />}
+        {/* Width/height reserve the 2:3 space before the image arrives, so
+            the row doesn't jump as covers load. alt stays empty: the
+            title is printed right below, so a screen reader would
+            otherwise hear it twice. */}
+        {cover && <img src={cover} alt="" width="158" height="237" loading={lazy ? 'lazy' : undefined} decoding="async" />}
         {hasProgress && <span className="hscroll-progress-badge">Continue</span>}
       </div>
       <p className="hscroll-title">{title.name}</p>
@@ -34,9 +38,11 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
         <div className="hero-bg" style={{ backgroundImage: `url(${heroCover})` }} />
         <div className="hero-scrim" />
         <div className="hero-content">
-          <span className="hero-kicker">ROMANTASY · FADE TO BLACK</span>
+          <span className="hero-kicker">INTERACTIVE ROMANTASY · FADE TO BLACK</span>
           <h1 className="hero-headline">Choose how the story unfolds.</h1>
-          <p className="hero-sub">{titles.length} stories, every ending yours to find.</p>
+          <p className="hero-sub">
+            Romantasy you read and steer — your choices decide who you trust, what you risk, and how it ends. {titles.length} stories, every ending yours to find.
+          </p>
         </div>
       </div>
 
@@ -70,10 +76,34 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
               hasProgress={inProgressIds.has(title.id)}
               isPurchased={purchasedIds.has(title.id)}
               onSelect={onSelect}
+              // Below the fold when a Continue Reading row sits above it.
+              lazy={inProgress.length > 0}
             />
           ))}
         </HScrollRow>
       </div>
+
+      {/* Right after the covers rather than above them, so the books are
+          the first thing on screen and this answers "how does it work?"
+          for anyone still scrolling. */}
+      <h2 className="catalog-section-title">How it works</h2>
+      <ol className="how-it-works">
+        <li>
+          <span className="how-step">1</span>
+          <strong>Start free</strong>
+          <span>The first 3 chapters of every book are free — no sign-up needed.</span>
+        </li>
+        <li>
+          <span className="how-step">2</span>
+          <strong>Make your choices</strong>
+          <span>Every chapter ends on a decision that changes where the story goes.</span>
+        </li>
+        <li>
+          <span className="how-step">3</span>
+          <strong>Find every ending</strong>
+          <span>4 endings per book. Unlock the rest once, and replay as often as you like.</span>
+        </li>
+      </ol>
     </div>
   );
 }
@@ -87,10 +117,11 @@ export function SiteFooter() {
       textAlign: 'center',
     }}>
       <SocialLinks />
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 10 }}>
-        <a href="/terms.html" style={{ fontSize: 12, color: 'var(--ink-dim)' }}>Terms of Service</a>
-        <a href="/privacy.html" style={{ fontSize: 12, color: 'var(--ink-dim)' }}>Privacy Policy</a>
-        <a href="/refunds.html" style={{ fontSize: 12, color: 'var(--ink-dim)' }}>Refund Policy</a>
+      <div className="footer-links">
+        <a href="/terms.html">Terms of Service</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/refunds.html">Refund Policy</a>
+        <a href="mailto:support@wovenfate.app">Contact</a>
       </div>
       <p style={{ fontSize: 11, color: 'var(--ink-dim)', margin: 0 }}>
         © {new Date().getFullYear()} Wovenfate

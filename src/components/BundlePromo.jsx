@@ -76,19 +76,15 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
 
   if (isAnonymous && waiting) {
     return (
-      <div className={compact ? '' : 'page'}>
+      <div className={compact ? '' : 'page'} style={{ textAlign: 'center' }}>
         <AuthGate
           heading="Create a free account to continue"
           description="This keeps your purchase safe — it can't be lost even if you clear your browser or switch devices. No password needed."
           redirectPath={redirectPath}
-          compact={compact}
           crossDevice={crossDevice}
           onLinkSent={(email, mode) => { setCrossDeviceEmail(email); setCrossDeviceMode(mode); }}
         />
-        <button
-          onClick={() => setWaiting(false)}
-          style={{ background: 'none', border: 'none', color: 'var(--ink-dim)', fontSize: 12, textDecoration: 'underline', cursor: 'pointer', marginTop: 10, padding: 0 }}
-        >
+        <button className="btn-link" onClick={() => setWaiting(false)} style={{ marginTop: 12 }}>
           Never mind
         </button>
       </div>
@@ -97,17 +93,8 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
 
   if (compact) {
     return (
-      <div style={{ marginTop: 14, textAlign: 'center' }}>
-        <button
-          onClick={handleClick}
-          disabled={loading}
-          className="choice-btn"
-          style={{
-            width: '100%', textAlign: 'center', fontWeight: 600,
-            background: 'transparent', borderLeft: '3px solid var(--ember)',
-            color: 'var(--ember)',
-          }}
-        >
+      <div style={{ textAlign: 'center' }}>
+        <button onClick={handleClick} disabled={loading} className="btn-secondary">
           {loading
             ? 'Opening checkout…'
             : savingsCents > 0
@@ -152,12 +139,7 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
             Credited {`£${(alreadyPaid / 100).toFixed(2)}`} for books you already own
           </p>
         )}
-        <button
-          className="choice-btn"
-          style={{ background: 'var(--ember)', color: '#1f1408', borderLeft: 'none', textAlign: 'center', fontWeight: 600, width: '100%' }}
-          onClick={handleClick}
-          disabled={loading}
-        >
+        <button className="btn-primary" onClick={handleClick} disabled={loading}>
           {loading ? 'Opening checkout…' : `Unlock ${countLabel} — ${priceDisplay}`}
         </button>
         {error && <p style={{ fontSize: 13, color: 'var(--ember)', marginTop: 12 }}>{error}</p>}

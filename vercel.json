@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/book/:titleId", "destination": "/index.html" },
+    { "source": "/read/:titleId", "destination": "/index.html" }
+  ]
 }

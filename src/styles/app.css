@@ -55,8 +55,8 @@
     flex-shrink: 0;
   }
   .app-header-account-label {
-    font-size: 9px; font-weight: 600; letter-spacing: 0.02em; color: var(--ember);
-    white-space: nowrap;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--ember);
+    white-space: nowrap; line-height: 1;
   }
   /* Absolutely centered on the header bar itself, rather than distributed
      via flex between the two side columns — that way the logo's position
@@ -234,8 +234,11 @@
   /* Landing page: hero + horizontal-scroll catalog rows */
   .hero {
     position: relative;
-    margin: -20px -16px 28px;
-    height: 260px;
+    margin: -20px -16px 22px;
+    /* min-height rather than a fixed height, so the longer pitch line can
+       grow the hero on narrow phones instead of being clipped. */
+    min-height: 260px;
+    display: flex; flex-direction: column;
     overflow: hidden;
   }
   .hero-bg {
@@ -248,9 +251,9 @@
     background: linear-gradient(180deg, rgba(23,20,31,0.2) 0%, var(--bg) 92%);
   }
   .hero-content {
-    position: relative; height: 100%;
+    position: relative; flex: 1;
     display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 0 20px 22px;
+    padding: 120px 20px 22px;
   }
   .hero-kicker {
     font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--ember);
@@ -357,7 +360,117 @@
     overflow: hidden;
   }
   .hscroll-meta {
-    font-size: 11px; color: var(--ink-dim); margin: 0;
+    font-size: 13px; color: #bfb4d1; margin: 0;
+  }
+
+  /* --- Buttons -------------------------------------------------------
+     One solid primary action per view, one outline secondary, and a text
+     link for "never mind" style exits — so the main action never looks
+     like one of the story's choice cards (.choice-btn). */
+  .btn-primary, .btn-secondary {
+    display: block; width: 100%; text-align: center;
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+    padding: 14px 18px; border-radius: 10px; cursor: pointer;
+    transition: filter .15s, transform .1s, background .15s;
+  }
+  .btn-primary { background: var(--ember); color: #1f1408; border: 1px solid var(--ember); }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-secondary { background: transparent; color: var(--ember); border: 1.5px solid var(--ember); }
+  .btn-secondary:hover { background: var(--ember-soft); }
+  .btn-primary:active, .btn-secondary:active { transform: scale(0.98); }
+  .btn-primary:disabled, .btn-secondary:disabled { opacity: 0.6; cursor: default; }
+  .btn-link {
+    background: none; border: none; padding: 8px 4px; cursor: pointer;
+    color: var(--ink-dim); font-size: 13px; text-decoration: underline;
+  }
+
+  /* --- Landing: how it works ---------------------------------------- */
+  .how-it-works {
+    list-style: none; margin: 0 0 30px; padding: 0;
+    display: grid; gap: 10px;
+  }
+  .how-it-works li {
+    display: grid; grid-template-columns: 30px 1fr; column-gap: 12px; row-gap: 2px;
+    align-items: start; padding: 12px 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .how-step {
+    grid-row: span 2; width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--ember-soft); color: var(--ember);
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px;
+  }
+  .how-it-works strong { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600; }
+  .how-it-works li > span:last-child { font-size: 13px; color: var(--ink-dim); line-height: 1.45; }
+
+  /* --- Book page ----------------------------------------------------- */
+  .book-facts {
+    list-style: none; margin: 0 auto 16px; padding: 0; max-width: 420px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .book-facts li {
+    display: flex; flex-direction: column; gap: 2px; padding: 10px 6px;
+    background: var(--surface-raised); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .book-facts strong { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; }
+  .book-facts span { font-size: 12px; color: var(--ink-dim); }
+  .book-tropes {
+    list-style: none; margin: 0 auto 18px; padding: 0; max-width: 460px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+  }
+  .book-tropes li {
+    font-size: 12px; color: var(--ink); padding: 4px 10px;
+    border: 1px solid var(--border); border-radius: 20px; background: rgba(138, 106, 168, 0.12);
+  }
+  .cover-page-unlock { margin-top: 12px; }
+  .book-notes {
+    font-size: 12px; color: var(--ink-dim); line-height: 1.5;
+    margin: 20px auto 0; max-width: 440px;
+  }
+
+  /* --- Paywall ------------------------------------------------------- */
+  .paywall { text-align: center; }
+  .paywall-chosen { font-size: 13px; color: var(--ink-dim); margin: 0 0 10px; }
+  .paywall-chosen em { color: var(--ink); font-style: italic; font-family: 'Fraunces', serif; }
+  .paywall-heading { font-family: 'Fraunces', serif; font-size: 20px; margin: 0 0 14px; }
+  .paywall-progress { max-width: 280px; margin: 0 auto 14px; }
+  .paywall-progress-bar {
+    height: 6px; border-radius: 3px; background: var(--surface-raised); overflow: hidden;
+  }
+  .paywall-progress-bar span {
+    display: block; height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--violet), var(--ember));
+  }
+  .paywall-progress p { font-size: 12px; color: var(--ink-dim); margin: 6px 0 0; }
+  .paywall-sub { font-size: 14px; color: var(--ink-dim); line-height: 1.5; margin: 0 0 20px; }
+  .paywall-or {
+    display: flex; align-items: center; gap: 12px; margin: 18px 0 14px;
+    color: var(--ink-dim); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .paywall-or::before, .paywall-or::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  /* --- Footer -------------------------------------------------------- */
+  .footer-links {
+    display: flex; justify-content: center; flex-wrap: wrap; column-gap: 6px; margin-bottom: 6px;
+  }
+  /* Padding gives each small text link a comfortable ~40px-tall tap area. */
+  .footer-links a {
+    font-size: 13px; color: var(--ink-dim); padding: 12px 8px;
+  }
+  .footer-links a:hover { color: var(--ink); }
+
+  /* --- Accessibility --------------------------------------------------
+     A visible focus ring for keyboard users on every interactive element
+     (mouse/touch clicks don't trigger :focus-visible, so this never shows
+     for them). */
+  :where(a, button, input, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--ember); outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+    }
   }
 
   /* Desktop layout — phone/tablet styles above are untouched below this
@@ -377,15 +490,23 @@
     }
     .hero {
       margin-left: -40px; margin-right: -40px;
-      height: 360px;
+      min-height: 360px;
     }
-    .hero-content { padding: 0 40px 36px; }
+    .hero-content { padding: 160px 40px 36px; }
     .hero-headline { font-size: 40px; max-width: 520px; }
-    .hero-sub { font-size: 17px; }
+    .hero-sub { font-size: 17px; max-width: 620px; }
+    .how-it-works { grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 36px; }
     .catalog-section-title { font-size: 19px; }
     .hscroll {
       flex-wrap: wrap;
       overflow-x: visible;
       scroll-snap-type: none;
+      gap: 18px;
     }
+    /* Five covers fill the 1000px row at desktop width instead of sitting
+       small in empty space. */
+    .hscroll-card { width: 185px; }
+    .hscroll-cover { width: 185px; height: 278px; }
+    .hscroll-title { font-size: 15px; }
+    .hscroll-nav { top: 123px; }
   }
