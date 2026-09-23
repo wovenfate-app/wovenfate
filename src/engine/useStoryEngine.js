@@ -10,7 +10,11 @@ import { useState, useCallback, useEffect, useRef } from 'react';
  * a previous session (see useReadingProgress) — pass null/undefined to
  * always start fresh.
  */
-export function useStoryEngine(story, resumeFrom, onChange) {
+export function useStoryEngine(story, resumeFromRaw, onChange) {
+  // Saved progress can point at a node that no longer exists (a title
+  // rewritten with new node ids). Treat that as no saved progress, so the
+  // reader starts the book fresh instead of hitting an undefined node.
+  const resumeFrom = resumeFromRaw && story.nodes[resumeFromRaw.current_node_id] ? resumeFromRaw : null;
   const [currentNodeId, setCurrentNodeId] = useState(resumeFrom?.current_node_id || story.startNode);
   const [flags, setFlags] = useState(resumeFrom?.flags || {});
   const [pathTaken, setPathTaken] = useState(resumeFrom?.path_taken || []);

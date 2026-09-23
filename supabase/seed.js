@@ -37,7 +37,7 @@ const titles = [
   {
     id: 'binding-oath',
     name: 'The Binding Oath',
-    tagline: 'A rogue mage and the dragon-blooded knight hunting her are magically bound together — neither can go further than a mile from the other.',
+    tagline: 'A thief and the dragon-blooded knight sent to catch her are magically bound together — neither can go further than a mile from the other.',
     price_cents: 299,
     story: bindingOath,
   },

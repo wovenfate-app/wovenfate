@@ -101,7 +101,7 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
         <li>
           <span className="how-step">3</span>
           <strong>Find every ending</strong>
-          <span>4 endings per book. Unlock the rest once, and replay as often as you like.</span>
+          <span>7 endings per book. Unlock the rest once, and replay as often as you like.</span>
         </li>
       </ol>
     </div>
