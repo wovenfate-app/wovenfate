@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { isResumable } from './storyGraph.js';
 
 /**
  * Drives a branching story from its data (see data/stories/ember-court.js
@@ -11,10 +12,14 @@ import { useState, useCallback, useEffect, useRef } from 'react';
  * always start fresh.
  */
 export function useStoryEngine(story, resumeFromRaw, onChange) {
-  // Saved progress can point at a node that no longer exists (a title
-  // rewritten with new node ids). Treat that as no saved progress, so the
-  // reader starts the book fresh instead of hitting an undefined node.
-  const resumeFrom = resumeFromRaw && story.nodes[resumeFromRaw.current_node_id] ? resumeFromRaw : null;
+  // Saved progress can point at a node from a replaced version of the
+  // story (a title rewritten with new node ids — the old nodes may still
+  // be in the database, just no longer linked). Treat that as no saved
+  // progress, so the reader starts the current version at chapter one.
+  const resumeFrom = useMemo(
+    () => (isResumable(story, resumeFromRaw) ? resumeFromRaw : null),
+    [story, resumeFromRaw]
+  );
   const [currentNodeId, setCurrentNodeId] = useState(resumeFrom?.current_node_id || story.startNode);
   const [flags, setFlags] = useState(resumeFrom?.flags || {});
   const [pathTaken, setPathTaken] = useState(resumeFrom?.path_taken || []);
