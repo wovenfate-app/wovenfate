@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildEvent, createEventQueue } from './analyticsEvents.js';
+import { buildEvent, createEventQueue, visitPayload } from './analyticsEvents.js';
 
 test('buildEvent shapes a valid event with sane defaults', () => {
   const event = buildEvent('chapter_viewed', { titleId: 'ember-court', payload: { node_id: 'n3' } });
@@ -66,4 +66,25 @@ test('event queue drops oldest events past maxSize instead of growing unbounded'
   for (let i = 0; i < 5; i++) queue.add({ i });
   assert.equal(queue.size, 3);
   assert.deepEqual(queue.drain().map((e) => e.i), [2, 3, 4]);
+});
+
+test('visitPayload prefers utm tags from a campaign link', () => {
+  const p = visitPayload('https://wovenfate.app/book/ember-court?utm_source=TikTok&utm_campaign=ember-launch', 'https://www.tiktok.com/');
+  assert.equal(p.source, 'tiktok');
+  assert.equal(p.campaign, 'ember-launch');
+  assert.equal(p.referrer_host, 'tiktok.com');
+  assert.equal(p.landing_path, '/book/ember-court');
+});
+
+test('visitPayload falls back to the referring host, then direct', () => {
+  assert.equal(visitPayload('https://wovenfate.app/', 'https://l.instagram.com/?u=x').source, 'l.instagram.com');
+  assert.equal(visitPayload('https://wovenfate.app/', '').source, 'direct');
+});
+
+test('visitPayload ignores our own site (and its www.) as a referrer', () => {
+  assert.equal(visitPayload('https://wovenfate.app/', 'https://www.wovenfate.app/book/ashbound').source, 'direct');
+});
+
+test('site_visited is an accepted event type', () => {
+  assert.equal(buildEvent('site_visited', { payload: { source: 'tiktok' } }).event_type, 'site_visited');
 });

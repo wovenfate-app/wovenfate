@@ -25,12 +25,30 @@ import { LandingPage, SiteFooter } from './components/LandingPage.jsx';
 import { TitleCoverPage } from './components/TitleCoverPage.jsx';
 import { AppHeader } from './components/AppHeader.jsx';
 import { AccountModal } from './components/AccountModal.jsx';
+import { visitPayload } from './engine/analyticsEvents.js';
 import './styles/app.css';
+
+// The URL and referrer this visit arrived with, before any in-app
+// navigation replaces them (see the site_visited effect in App).
+const LANDING = { href: window.location.href, referrer: document.referrer };
 
 export default function App() {
   const { user, loading: authLoading, isAnonymous } = useAuth();
   const { track } = useAnalytics(user?.id);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
+
+  // One site_visited event per browser session, recording where the
+  // visit came from (utm_* on campaign links, else the referring site).
+  // LANDING is captured at module load, before navigate() rewrites the
+  // URL. Waits for the anonymous user, since events need an owner.
+  useEffect(() => {
+    if (!user?.id) return;
+    try {
+      if (sessionStorage.getItem('wf_visit_logged')) return;
+      sessionStorage.setItem('wf_visit_logged', '1');
+    } catch { /* storage blocked — log it anyway, at worst twice */ }
+    track('site_visited', { payload: visitPayload(LANDING.href, LANDING.referrer) });
+  }, [user?.id, track]);
 
   // Which screen is showing, kept in step with the URL (see routes.js):
   // /, /book/:id (the title's cover page) or /read/:id. Reading it from

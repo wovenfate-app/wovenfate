@@ -19,6 +19,7 @@ const VALID_EVENT_TYPES = new Set([
   'paywall_viewed',
   'checkout_started',
   'ending_reached',
+  'site_visited',
 ]);
 
 const MAX_PAYLOAD_KEYS = 8;
@@ -72,6 +73,34 @@ function sanitizePayload(payload) {
     kept += 1;
   }
   return clean;
+}
+
+/**
+ * Where a visit came from, for the one `site_visited` event logged per
+ * browser session. Campaign links carry utm_* parameters (e.g. the social
+ * bio link ?utm_source=tiktok&utm_campaign=ember-launch); without them the
+ * referring site stands in as the source, and no referrer at all is
+ * "direct". Only hosts are kept from the referrer, never full URLs.
+ */
+export function visitPayload(href, referrer = '') {
+  let url;
+  try { url = new URL(href); } catch { return { source: 'direct' }; }
+  const params = url.searchParams;
+  let referrerHost = null;
+  try {
+    const bare = (host) => host.replace(/^www\./, '');
+    const ref = referrer ? new URL(referrer) : null;
+    // Our own pages (including the www. redirect) aren't a source.
+    if (ref && bare(ref.host) !== bare(url.host)) referrerHost = bare(ref.host);
+  } catch { /* unparseable referrer — treat as none */ }
+
+  return {
+    source: (params.get('utm_source') || referrerHost || 'direct').toLowerCase(),
+    medium: params.get('utm_medium') || undefined,
+    campaign: params.get('utm_campaign') || undefined,
+    referrer_host: referrerHost || undefined,
+    landing_path: url.pathname,
+  };
 }
 
 /**
