@@ -75,5 +75,5 @@ export function useBundlePurchase(userId, catalog, waitingForLink) {
     }
   }, []);
 
-  return { hasFullLibrary, startBundleCheckout, checkoutLoading, checkoutError };
+  return { hasFullLibrary, startBundleCheckout, checkoutLoading, checkoutError, refresh: checkOwnership };
 }

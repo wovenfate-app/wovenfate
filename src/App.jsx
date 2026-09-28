@@ -28,6 +28,8 @@ import { AccountModal } from './components/AccountModal.jsx';
 import { visitPayload } from './engine/analyticsEvents.js';
 import { isFreeTitle, nextTitleSuggestions } from './engine/pricing.js';
 import { endingQuote } from './engine/shareEnding.js';
+import { codeFromSearch } from './engine/giftCodes.js';
+import { RedeemCode } from './components/RedeemCode.jsx';
 import './styles/app.css';
 
 // The URL and referrer this visit arrived with, before any in-app
@@ -140,6 +142,18 @@ export default function App() {
   const selectedTitleIsFree = isFreeTitle(catalog?.find((t) => t.id === selectedTitleId));
   const purchase = selectedTitleIsFree ? { ...ownedPurchase, isUnlocked: true } : ownedPurchase;
   const bundle = useBundlePurchase(user?.id, catalog, bundleWaiting);
+
+  // Gift codes: a ?redeem=CODE link (what creators are sent) opens the
+  // "Have a code?" box pre-filled. After a successful redeem, re-check
+  // ownership so every book shows as unlocked straight away.
+  const [redeemCode] = useState(() => codeFromSearch(new URL(LANDING.href).search));
+  const handleRedeemed = useCallback((status) => {
+    if (status === 'ok') track('gift_code_redeemed', {});
+    bundle.refresh();
+    ownedPurchase.refresh();
+    if (user?.id) fetchPurchasedTitleIds(user.id).then(setPurchasedIds).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [track, bundle.refresh, ownedPurchase.refresh, user?.id]);
 
   // Wrapped once here so both the landing-page bundle promo and the
   // in-reader one (passed down to StoryReader) log the same event shape.
@@ -314,6 +328,9 @@ export default function App() {
               waiting={bundleWaiting}
               setWaiting={setBundleWaiting}
             />
+            {(!bundle.hasFullLibrary || redeemCode) && (
+              <RedeemCode isAnonymous={isAnonymous} initialCode={redeemCode} onRedeemed={handleRedeemed} />
+            )}
           </div>
           <SiteFooter />
         </div>
@@ -388,6 +405,7 @@ export default function App() {
       userEmail={user?.email}
       onBackToLanding={handleBackToLanding}
       onOpenTitle={handleSelectTitle}
+      onRedeemed={handleRedeemed}
       accountModalOpen={accountModalOpen}
       setAccountModalOpen={setAccountModalOpen}
       singleWaiting={singleWaiting}
@@ -398,7 +416,7 @@ export default function App() {
   );
 }
 
-function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, track, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, onOpenTitle, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
+function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, track, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, onOpenTitle, onRedeemed, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
   const { currentNode, currentNodeId, pathTaken, choose, restart } = useStoryEngine(story, resumeFrom, onProgressChange);
   const details = BOOK_DETAILS[title.id];
   const [savedSettings, updateSavedSettings] = useNarratorSettings();
@@ -657,6 +675,11 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
                   setWaiting={setBundleWaiting}
                   compact
                 />
+              )}
+              {!singleWaiting && !bundleWaiting && (
+                <div style={{ marginTop: 14 }}>
+                  <RedeemCode isAnonymous={isAnonymous} onRedeemed={onRedeemed} compact />
+                </div>
               )}
             </Paywall>
           ) : (

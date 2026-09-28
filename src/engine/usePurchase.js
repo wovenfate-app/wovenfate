@@ -91,5 +91,5 @@ export function usePurchase(userId, titleId, waitingForLink) {
     }
   }, [titleId]);
 
-  return { isUnlocked, startCheckout, checkoutLoading, checkoutError };
+  return { isUnlocked, startCheckout, checkoutLoading, checkoutError, refresh: checkUnlockStatus };
 }
