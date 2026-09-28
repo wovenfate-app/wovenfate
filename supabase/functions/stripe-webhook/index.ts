@@ -125,10 +125,13 @@ Deno.serve(async (req) => {
       // purchases row per title, same shape as a single purchase, so
       // the existing per-title unlock check (usePurchase) needs zero
       // changes to recognize a bundle-purchased title as unlocked.
+      // Paid titles only: a free title (price 0) is already open to
+      // everyone, so it isn't part of the bundle or its receipt email.
       const { data: titles, error: titlesError } = await supabaseAdmin
         .from('titles')
         .select('id, name')
-        .eq('is_published', true);
+        .eq('is_published', true)
+        .gt('price_cents', 0);
 
       if (titlesError || !titles) {
         console.error('Failed to load titles for bundle unlock:', titlesError?.message);

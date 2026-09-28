@@ -31,7 +31,9 @@ const titles = [
     id: 'ember-court',
     name: 'The Ember Court',
     tagline: 'A former lover, now bound to a dying fae court, calls in a debt neither of you understood the weight of.',
-    price_cents: 299,
+    // Free as the "first book free" promo (see src/engine/pricing.js).
+    // Set back to 299 to make it a paid title again.
+    price_cents: 0,
     story: emberCourt,
   },
   {

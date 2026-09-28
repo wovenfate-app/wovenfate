@@ -58,7 +58,7 @@ for (const [receipt, items] of byReceipt) {
   const r = row(src(items[0].user_id));
   r.buyers.add(items[0].user_id);
   r.orders.add(receipt);
-  r.revenue += items.length >= 5 ? 10 : 2.99 * items.length;
+  r.revenue += items.length > 1 ? 10 : 2.99; // a bundle writes a row per paid title
 }
 
 const titleViews = {};

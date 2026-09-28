@@ -1,23 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, fetchPurchasedTitleIds } from '../data/supabaseClient.js';
+import { ownsFullLibrary } from './pricing.js';
 
 /**
- * Reports whether the reader already owns every published title
+ * Reports whether the reader already owns every paid title
  * (`hasFullLibrary`), and exposes `startBundleCheckout()`. Mirrors
- * usePurchase's shape, but there's no single titleId to check against —
- * ownership means "purchased count >= catalog size."
+ * usePurchase's shape, but there's no single titleId to check against.
+ * Free titles aren't in the bundle, so `catalog` is filtered through
+ * ownsFullLibrary (see pricing.js) rather than compared by count.
  */
-export function useBundlePurchase(userId, catalogSize, waitingForLink) {
+export function useBundlePurchase(userId, catalog, waitingForLink) {
   const [hasFullLibrary, setHasFullLibrary] = useState(undefined); // undefined = still checking
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
 
   const checkOwnership = useCallback(() => {
-    if (!userId || !catalogSize) return;
+    if (!userId || !catalog?.length) return;
     fetchPurchasedTitleIds(userId)
-      .then((ids) => setHasFullLibrary(ids.size >= catalogSize))
+      .then((ids) => setHasFullLibrary(ownsFullLibrary(catalog, ids)))
       .catch((err) => console.error('Failed to check bundle ownership:', err.message));
-  }, [userId, catalogSize]);
+  }, [userId, catalog]);
 
   useEffect(() => { checkOwnership(); }, [checkOwnership]);
 

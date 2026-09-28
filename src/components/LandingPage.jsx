@@ -2,11 +2,15 @@ import { COVER_IMAGES } from '../data/covers.js';
 import { HScrollRow } from './HScrollRow.jsx';
 import { InstallBanner } from './InstallBanner.jsx';
 import { SocialLinks } from './SocialLinks.jsx';
+import { isFreeTitle } from '../engine/pricing.js';
 
 function CatalogCard({ title, hasProgress, isPurchased, onSelect, lazy }) {
   const cover = COVER_IMAGES[title.id];
   const priceDisplay = title.price_cents ? `£${(title.price_cents / 100).toFixed(2)}` : '';
-  const metaText = isPurchased ? 'Purchased' : hasProgress ? 'In progress' : `Free start · ${priceDisplay}`;
+  const metaText = hasProgress ? 'In progress'
+    : isFreeTitle(title) ? 'Free · whole book'
+    : isPurchased ? 'Purchased'
+    : `Free start · ${priceDisplay}`;
   return (
     <button className="hscroll-card" onClick={() => onSelect(title.id)}>
       <div className="hscroll-cover">
@@ -26,6 +30,7 @@ function CatalogCard({ title, hasProgress, isPurchased, onSelect, lazy }) {
 export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
   const inProgress = titles.filter((t) => inProgressIds.has(t.id));
   const discover = titles;
+  const freeTitle = titles.find(isFreeTitle);
 
   // Dedicated wide banner spanning all titles' motifs — deliberately
   // NOT a reused title cover, which left dead space when stretched
@@ -91,7 +96,11 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
         <li>
           <span className="how-step">1</span>
           <strong>Start free</strong>
-          <span>The first 3 chapters of every book are free — no sign-up needed.</span>
+          <span>
+            {freeTitle
+              ? `${freeTitle.name} is free to read in full, and every other book's first 3 chapters are free. No sign-up needed.`
+              : 'The first 3 chapters of every book are free — no sign-up needed.'}
+          </span>
         </li>
         <li>
           <span className="how-step">2</span>

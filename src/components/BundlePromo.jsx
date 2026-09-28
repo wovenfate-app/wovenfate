@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AuthGate } from './AuthGate.jsx';
 import { isNativeApp } from '../engine/platform.js';
 import { useCrossDeviceEmailCheck } from '../engine/useCrossDeviceEmailCheck.js';
+import { paidTitles } from '../engine/pricing.js';
 
 // Mirrors the server's pricing exactly (see create-checkout-session)
 // so what's displayed always matches what Stripe will actually charge.
@@ -33,8 +34,12 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
     );
   }
 
-  const owned = titles.filter((t) => purchasedIds?.has(t.id));
-  const remaining = titles.filter((t) => !purchasedIds?.has(t.id));
+  // Free titles aren't in the bundle (see pricing.js), so everything
+  // below — the count, the credit and the saving — is over paid titles.
+  const bundleTitles = paidTitles(titles);
+  const hasFreeTitle = bundleTitles.length < titles.length;
+  const owned = bundleTitles.filter((t) => purchasedIds?.has(t.id));
+  const remaining = bundleTitles.filter((t) => !purchasedIds?.has(t.id));
   const alreadyPaid = owned.reduce((sum, t) => sum + (t.price_cents || 0), 0);
   const remainingIndividualTotal = remaining.reduce((sum, t) => sum + (t.price_cents || 0), 0);
   const unitAmount = Math.max(MIN_CHARGE_CENTS, BUNDLE_PRICE_CENTS - alreadyPaid);
@@ -45,7 +50,11 @@ export function BundlePromo({ titles, purchasedIds, isAnonymous, hasFullLibrary,
   const savingsCents = Math.max(0, remainingIndividualTotal - unitAmount);
   const savingsDisplay = `£${(savingsCents / 100).toFixed(2)}`;
   const label = hasCredit ? `Complete your collection — ${remaining.length} left` : 'Full Library';
-  const countLabel = hasCredit ? `the remaining ${remaining.length} book${remaining.length === 1 ? '' : 's'}` : `all ${titles.length} books`;
+  const countLabel = hasCredit
+    ? `the remaining ${remaining.length} book${remaining.length === 1 ? '' : 's'}`
+    : hasFreeTitle
+    ? `the other ${bundleTitles.length} books`
+    : `all ${bundleTitles.length} books`;
 
   const handleClick = () => {
     if (isAnonymous) { setWaiting(true); return; }

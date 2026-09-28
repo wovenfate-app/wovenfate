@@ -2,6 +2,7 @@ import { COVER_IMAGES } from '../data/covers.js';
 import { BOOK_DETAILS, AGE_GUIDANCE } from '../data/bookDetails.js';
 import { getCoverCtaLabel } from '../engine/coverGate.js';
 import { UnlockTitleAction } from './UnlockTitleAction.jsx';
+import { isFreeTitle } from '../engine/pricing.js';
 
 const HEAT_LABELS = {
   'fade-to-black': 'Fade to Black',
@@ -19,7 +20,10 @@ export function TitleCoverPage({ title, hasProgress, isPurchased, onEnter, unloc
   const priceDisplay = title.price_cents ? `£${(title.price_cents / 100).toFixed(2)}` : '';
   const heatLabel = HEAT_LABELS[title.heat_level] || title.heat_level;
 
-  const statusLine = isPurchased
+  const free = isFreeTitle(title);
+  const statusLine = free
+    ? `Free to read · the whole book${details ? `, all ${details.endings} endings` : ''} · no sign-up needed`
+    : isPurchased
     ? 'You own this title — read on'
     : hasProgress
     ? `Continue for free, or unlock the rest for ${priceDisplay}`
@@ -54,7 +58,7 @@ export function TitleCoverPage({ title, hasProgress, isPurchased, onEnter, unloc
         {getCoverCtaLabel(hasProgress)}
       </button>
 
-      {!isPurchased && unlock && (
+      {!free && !isPurchased && unlock && (
         <div className="cover-page-unlock">
           <UnlockTitleAction title={title} secondary {...unlock} />
         </div>

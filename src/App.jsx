@@ -26,6 +26,7 @@ import { TitleCoverPage } from './components/TitleCoverPage.jsx';
 import { AppHeader } from './components/AppHeader.jsx';
 import { AccountModal } from './components/AccountModal.jsx';
 import { visitPayload } from './engine/analyticsEvents.js';
+import { isFreeTitle, nextTitleSuggestions } from './engine/pricing.js';
 import './styles/app.css';
 
 // The URL and referrer this visit arrived with, before any in-app
@@ -132,8 +133,12 @@ export default function App() {
   const { initialProgress, saveProgress } = useReadingProgress(user?.id, selectedTitleId);
   const [singleWaiting, setSingleWaiting] = useState(false);
   const [bundleWaiting, setBundleWaiting] = useState(false);
-  const purchase = usePurchase(user?.id, selectedTitleId, singleWaiting);
-  const bundle = useBundlePurchase(user?.id, catalog?.length, bundleWaiting);
+  const ownedPurchase = usePurchase(user?.id, selectedTitleId, singleWaiting);
+  // A free title (price 0, see pricing.js) is unlocked for everyone:
+  // every chapter opens and the paywall never shows.
+  const selectedTitleIsFree = isFreeTitle(catalog?.find((t) => t.id === selectedTitleId));
+  const purchase = selectedTitleIsFree ? { ...ownedPurchase, isUnlocked: true } : ownedPurchase;
+  const bundle = useBundlePurchase(user?.id, catalog, bundleWaiting);
 
   // Wrapped once here so both the landing-page bundle promo and the
   // in-reader one (passed down to StoryReader) log the same event shape.
@@ -381,6 +386,7 @@ export default function App() {
       isAnonymous={isAnonymous}
       userEmail={user?.email}
       onBackToLanding={handleBackToLanding}
+      onOpenTitle={handleSelectTitle}
       accountModalOpen={accountModalOpen}
       setAccountModalOpen={setAccountModalOpen}
       singleWaiting={singleWaiting}
@@ -391,7 +397,7 @@ export default function App() {
   );
 }
 
-function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, track, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
+function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bundle, track, catalog, purchasedIds, isAnonymous, userEmail, onBackToLanding, onOpenTitle, accountModalOpen, setAccountModalOpen, singleWaiting, setSingleWaiting, bundleWaiting, setBundleWaiting }) {
   const { currentNode, currentNodeId, pathTaken, choose, restart } = useStoryEngine(story, resumeFrom, onProgressChange);
   const details = BOOK_DETAILS[title.id];
   const [savedSettings, updateSavedSettings] = useNarratorSettings();
@@ -659,7 +665,18 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
             </div>
           )}
           {!isLockedAndUnpaid && currentNode.ending && (
-            <EndingModal titleId={title.id} titleName={title.name} endingTag={currentNode.tag} />
+            <EndingModal
+              titleId={title.id}
+              titleName={title.name}
+              endingTag={currentNode.tag}
+              endingsTotal={BOOK_DETAILS[title.id]?.endings}
+              // "What's next": the reader's next stories, unless they own them all.
+              nextTitles={bundle.hasFullLibrary ? [] : nextTitleSuggestions(catalog, title.id, purchasedIds)}
+              onOpenTitle={(id) => {
+                track('ending_next_clicked', { titleId: title.id, payload: { next_title_id: id, ending_tag: currentNode.tag } });
+                onOpenTitle(id);
+              }}
+            />
           )}
         </div>
       </div>

@@ -70,8 +70,12 @@ Deno.serve(async (req) => {
     if (titlesError || !allTitles) return new Response('Failed to load titles', { status: 500, headers: corsHeaders });
     if (ownedError) return new Response('Failed to load purchases', { status: 500, headers: corsHeaders });
 
+    // Free titles (price 0, the "first book free" promo) aren't part of
+    // the bundle: owning every PAID title is the full library. Same rule
+    // as src/engine/pricing.js on the client.
+    const paidTitles = allTitles.filter((t) => (t.price_cents || 0) > 0);
     const ownedIds = new Set((owned ?? []).map((p) => p.title_id));
-    if (ownedIds.size >= allTitles.length) {
+    if (paidTitles.every((t) => ownedIds.has(t.id))) {
       return new Response('Already own the full library', { status: 400, headers: corsHeaders });
     }
 
@@ -114,6 +118,8 @@ Deno.serve(async (req) => {
     .eq('id', titleId)
     .single();
   if (titleError || !title) return new Response('Title not found', { status: 404, headers: corsHeaders });
+  // A free title is already open to everyone; there's nothing to sell.
+  if (!title.price_cents) return new Response('This title is free', { status: 400, headers: corsHeaders });
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',

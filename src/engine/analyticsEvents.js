@@ -20,6 +20,7 @@ const VALID_EVENT_TYPES = new Set([
   'checkout_started',
   'ending_reached',
   'site_visited',
+  'ending_next_clicked', // "What's next" on an ending (the free-first-book funnel)
 ]);
 
 const MAX_PAYLOAD_KEYS = 8;
