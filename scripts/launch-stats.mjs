@@ -27,7 +27,10 @@ async function all(table, columns, timeColumn) {
 }
 
 const events = await all('analytics_events', 'user_id, title_id, event_type, payload, created_at', 'created_at');
-const purchases = await all('purchases', 'user_id, title_id, receipt, purchased_at', 'purchased_at');
+const allPurchases = await all('purchases', 'user_id, title_id, receipt, platform, purchased_at', 'purchased_at');
+// Gift-code unlocks write purchase rows too, but they aren't sales.
+const purchases = allPurchases.filter((p) => p.platform !== 'gift');
+const gifts = allPurchases.filter((p) => p.platform === 'gift');
 
 const sourceOf = new Map();
 for (const e of events) {
@@ -40,7 +43,7 @@ const src = (userId) => sourceOf.get(userId) || 'unknown';
 
 const rows = new Map();
 const row = (s) => {
-  if (!rows.has(s)) rows.set(s, { visitors: new Set(), readers: new Set(), paywall: new Set(), checkout: new Set(), buyers: new Set(), orders: new Set(), revenue: 0 });
+  if (!rows.has(s)) rows.set(s, { visitors: new Set(), readers: new Set(), paywall: new Set(), checkout: new Set(), buyers: new Set(), orders: new Set(), gifted: new Set(), revenue: 0 });
   return rows.get(s);
 };
 for (const e of events) {
@@ -60,6 +63,7 @@ for (const [receipt, items] of byReceipt) {
   r.orders.add(receipt);
   r.revenue += items.length > 1 ? 10 : 2.99; // a bundle writes a row per paid title
 }
+for (const g of gifts) row(src(g.user_id)).gifted.add(g.user_id);
 
 const titleViews = {};
 for (const e of events) if (e.event_type === 'chapter_viewed' && e.title_id) titleViews[e.title_id] = (titleViews[e.title_id] || 0) + 1;
@@ -72,6 +76,7 @@ const table = [...rows].sort((a, b) => b[1].readers.size - a[1].readers.size).ma
   'hit paywall': r.paywall.size,
   'began checkout': r.checkout.size,
   buyers: r.buyers.size,
+  'gift codes': r.gifted.size,
   'revenue £ (list)': r.revenue.toFixed(2),
 }));
 console.table(table);
