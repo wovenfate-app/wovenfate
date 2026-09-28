@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-book-meta.mjs",
     "preview": "vite preview",
     "test": "node --test",
     "narrate": "node scripts/generate-narration.mjs"
