@@ -16,6 +16,16 @@ export function RedeemCode({ isAnonymous, initialCode, onRedeemed, compact }) {
   const [state, setState] = useState('idle'); // idle | redeeming | done | error | needs_account
   const [message, setMessage] = useState('');
   const autoTried = useRef(false);
+  const boxRef = useRef(null);
+
+  // Arriving by a ?redeem= link: bring the box (and later its result) into
+  // view, since it sits below the book list. The short delay lets the
+  // catalogue render first so the page doesn't shift after scrolling.
+  useEffect(() => {
+    if (!initialCode) return;
+    const t = setTimeout(() => boxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+    return () => clearTimeout(t);
+  }, [initialCode, state]);
 
   const redeem = async (raw = code) => {
     const clean = normalizeCode(raw);
@@ -55,7 +65,7 @@ export function RedeemCode({ isAnonymous, initialCode, onRedeemed, compact }) {
   }, [initialCode, isAnonymous]);
 
   const wrap = (children) => (
-    <div className={compact ? 'redeem-code' : 'page redeem-code'} style={{ textAlign: 'center' }}>{children}</div>
+    <div ref={boxRef} className={compact ? 'redeem-code' : 'page redeem-code'} style={{ textAlign: 'center' }}>{children}</div>
   );
 
   if (state === 'done') {
