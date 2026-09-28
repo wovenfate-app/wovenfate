@@ -27,6 +27,7 @@ import { AppHeader } from './components/AppHeader.jsx';
 import { AccountModal } from './components/AccountModal.jsx';
 import { visitPayload } from './engine/analyticsEvents.js';
 import { isFreeTitle, nextTitleSuggestions } from './engine/pricing.js';
+import { endingQuote } from './engine/shareEnding.js';
 import './styles/app.css';
 
 // The URL and referrer this visit arrived with, before any in-app
@@ -669,7 +670,10 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
               titleId={title.id}
               titleName={title.name}
               endingTag={currentNode.tag}
+              endingLine={endingQuote(currentNode.text)}
               endingsTotal={BOOK_DETAILS[title.id]?.endings}
+              isFree={isFreeTitle(title)}
+              onShared={(method) => track('ending_shared', { titleId: title.id, payload: { ending_tag: currentNode.tag, method } })}
               // "What's next": the reader's next stories, unless they own them all.
               nextTitles={bundle.hasFullLibrary ? [] : nextTitleSuggestions(catalog, title.id, purchasedIds)}
               onOpenTitle={(id) => {

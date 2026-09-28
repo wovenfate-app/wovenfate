@@ -21,6 +21,7 @@ const VALID_EVENT_TYPES = new Set([
   'ending_reached',
   'site_visited',
   'ending_next_clicked', // "What's next" on an ending (the free-first-book funnel)
+  'ending_shared', // the ending card was shared (payload.method: native | download)
 ]);
 
 const MAX_PAYLOAD_KEYS = 8;

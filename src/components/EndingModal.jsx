@@ -1,18 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { generateEndingImage } from '../engine/generateEndingImage.js';
 import { COVER_IMAGES } from '../data/covers.js';
+import { shareText } from '../engine/shareEnding.js';
 
 // nextTitles: up to two other stories to offer once this one's over (see
 // nextTitleSuggestions in pricing.js). This is where a reader who finished
 // the free book is invited on to a paid one, so it's the funnel's key step.
-export function EndingModal({ titleId, titleName, endingTag, endingsTotal, nextTitles = [], onOpenTitle }) {
+export function EndingModal({ titleId, titleName, endingTag, endingLine, endingsTotal, isFree, nextTitles = [], onOpenTitle, onShared }) {
   const [status, setStatus] = useState('generating'); // generating | ready | dismissed | error
   const [imageUrl, setImageUrl] = useState(null);
+  const [copied, setCopied] = useState(false);
   const blobRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
-    generateEndingImage({ titleId, titleName, endingTag })
+    generateEndingImage({ titleId, titleName, endingTag, endingLine, endingsTotal, isFree })
       .then((blob) => {
         if (cancelled) return;
         blobRef.current = blob;
@@ -35,20 +37,24 @@ export function EndingModal({ titleId, titleName, endingTag, endingsTotal, nextT
     const blob = blobRef.current;
     if (!blob) return;
     const file = new File([blob], `${titleId}-ending.png`, { type: 'image/png' });
+    // The link lives in the text as well as `url`: many apps keep only the
+    // text when an image is attached, and the link is what lets the person
+    // it's sent to pick the book up.
+    const text = shareText({ titleId, titleName, endingTag, endingsTotal, isFree });
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: `My Wovenfate ending — ${titleName}`,
-          text: `I just finished ${titleName} on Wovenfate.`,
-        });
+        await navigator.share({ files: [file], title: `My Wovenfate ending — ${titleName}`, text });
+        onShared?.('native');
       } else {
+        // Desktop: save the image and put the message + link on the clipboard.
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = `${titleId}-ending.png`;
         a.click();
         URL.revokeObjectURL(url);
+        try { await navigator.clipboard.writeText(text); setCopied(true); } catch { /* clipboard blocked: the image still saved */ }
+        onShared?.('download');
       }
     } catch (err) {
       if (err.name !== 'AbortError') console.error('Share failed:', err);
@@ -128,6 +134,12 @@ export function EndingModal({ titleId, titleName, endingTag, endingsTotal, nextT
             Not now
           </button>
         </div>
+
+        {copied && (
+          <p style={{ fontSize: 12, color: 'var(--violet)', margin: '10px 0 0' }}>
+            Image saved, and the message with the link is copied, ready to paste.
+          </p>
+        )}
 
         {endingsTotal > 1 && (
           <p style={{ fontSize: 12, color: 'var(--ink-dim)', margin: '14px 0 0' }}>
