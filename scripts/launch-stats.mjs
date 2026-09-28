@@ -28,8 +28,9 @@ async function all(table, columns, timeColumn) {
 
 const events = await all('analytics_events', 'user_id, title_id, event_type, payload, created_at', 'created_at');
 const allPurchases = await all('purchases', 'user_id, title_id, receipt, platform, purchased_at', 'purchased_at');
-// Gift-code unlocks write purchase rows too, but they aren't sales.
-const purchases = allPurchases.filter((p) => p.platform !== 'gift');
+// Gift-code unlocks write purchase rows too, but they aren't sales; nor
+// are Stripe test-mode checkouts (cs_test_ sessions) from development.
+const purchases = allPurchases.filter((p) => p.platform !== 'gift' && !String(p.receipt).startsWith('cs_test_'));
 const gifts = allPurchases.filter((p) => p.platform === 'gift');
 
 const sourceOf = new Map();
