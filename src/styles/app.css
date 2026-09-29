@@ -384,6 +384,27 @@
     color: var(--ink-dim); font-size: 13px; text-decoration: underline;
   }
 
+  /* --- Landing: coming soon ------------------------------------------ */
+  .coming-soon {
+    display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: start;
+    padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .coming-soon img {
+    width: 120px; height: 180px; object-fit: cover; display: block;
+    border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  }
+  .coming-soon-text { min-width: 0; display: grid; gap: 6px; }
+  .coming-soon-kicker {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ember);
+  }
+  .coming-soon h3 { font-family: 'Fraunces', serif; font-size: 19px; line-height: 1.2; margin: 0; }
+  .coming-soon p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-dim); }
+  .coming-soon .coming-soon-hook { color: var(--ink); font-style: italic; }
+  @media (max-width: 380px) {
+    .coming-soon { grid-template-columns: 90px 1fr; }
+    .coming-soon img { width: 90px; height: 135px; }
+  }
+
   /* --- Landing: how it works ---------------------------------------- */
   .how-it-works {
     list-style: none; margin: 0 0 30px; padding: 0;

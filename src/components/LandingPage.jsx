@@ -3,6 +3,23 @@ import { HScrollRow } from './HScrollRow.jsx';
 import { InstallBanner } from './InstallBanner.jsx';
 import { SocialLinks } from './SocialLinks.jsx';
 import { isFreeTitle } from '../engine/pricing.js';
+import { COMING_SOON } from '../data/comingSoon.js';
+
+// A book announced ahead of release: cover, date and blurb, nothing to
+// click. It disappears once the book itself is in the catalogue.
+function ComingSoonCard({ book }) {
+  return (
+    <article className="coming-soon" aria-label={`${book.name}, ${book.releaseLabel}`}>
+      <img src={book.cover} alt="" width="120" height="180" loading="lazy" decoding="async" />
+      <div className="coming-soon-text">
+        <span className="coming-soon-kicker">{book.releaseLabel} · {book.genre}</span>
+        <h3>{book.name}</h3>
+        <p>{book.blurb}</p>
+        <p className="coming-soon-hook">{book.hook}</p>
+      </div>
+    </article>
+  );
+}
 
 function CatalogCard({ title, hasProgress, isPurchased, onSelect, lazy }) {
   const cover = COVER_IMAGES[title.id];
@@ -31,6 +48,8 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
   const inProgress = titles.filter((t) => inProgressIds.has(t.id));
   const discover = titles;
   const freeTitle = titles.find(isFreeTitle);
+  const liveIds = new Set(titles.map((t) => t.id));
+  const comingSoon = COMING_SOON.filter((b) => !liveIds.has(b.id));
 
   // Dedicated wide banner spanning all titles' motifs — deliberately
   // NOT a reused title cover, which left dead space when stretched
@@ -87,6 +106,13 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
           ))}
         </HScrollRow>
       </div>
+
+      {comingSoon.length > 0 && (
+        <div className="catalog-section">
+          <h2 className="catalog-section-title">Coming soon</h2>
+          {comingSoon.map((book) => <ComingSoonCard key={book.id} book={book} />)}
+        </div>
+      )}
 
       {/* Right after the covers rather than above them, so the books are
           the first thing on screen and this answers "how does it work?"
