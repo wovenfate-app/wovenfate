@@ -40,6 +40,20 @@ export function TitleCoverPage({ title, hasProgress, isPurchased, onEnter, unloc
       <h1 className="cover-page-title">{title.name}</h1>
       {title.tagline && <p className="cover-page-tagline">{title.tagline}</p>}
 
+      {/* The way in comes straight after the pitch, so it's on screen when
+          someone lands here from a phone link; the details follow for
+          anyone who wants them. */}
+      <p className="cover-page-meta">{statusLine}</p>
+      <button className="btn-primary" onClick={onEnter}>
+        {getCoverCtaLabel(hasProgress)}
+      </button>
+
+      {!free && !isPurchased && unlock && (
+        <div className="cover-page-unlock">
+          <UnlockTitleAction title={title} secondary {...unlock} />
+        </div>
+      )}
+
       {details && (
         <>
           <ul className="book-facts" aria-label="About this book">
@@ -51,17 +65,6 @@ export function TitleCoverPage({ title, hasProgress, isPurchased, onEnter, unloc
             {details.tropes.map((trope) => <li key={trope}>{trope}</li>)}
           </ul>
         </>
-      )}
-
-      <p className="cover-page-meta">{statusLine}</p>
-      <button className="btn-primary" onClick={onEnter}>
-        {getCoverCtaLabel(hasProgress)}
-      </button>
-
-      {!free && !isPurchased && unlock && (
-        <div className="cover-page-unlock">
-          <UnlockTitleAction title={title} secondary {...unlock} />
-        </div>
       )}
 
       {details && (

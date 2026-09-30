@@ -684,6 +684,11 @@ function StoryReader({ title, story, resumeFrom, onProgressChange, purchase, bun
             </Paywall>
           ) : (
             <div className="page page-transition" key={currentNode.chapter}>
+              {/* New readers get a page of prose before anything
+                  interactive, so tell them a choice is coming. */}
+              {currentNodeId === story.startNode && (
+                <p className="first-choice-hint">Your first choice is at the end of this chapter.</p>
+              )}
               <ChapterView node={currentNode} spokenWord={spokenWord} />
               <ChoiceList node={currentNode} onChoose={trackedChoose} onRestart={restart} />
             </div>
