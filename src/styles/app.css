@@ -162,6 +162,14 @@
   /* After the buttons now, so give the details some air above them. */
   .cover-page .book-facts { margin-top: 22px; }
 
+  /* "Email me about new books" — the optional consent tick box under the
+     email field, and the same choice in the account panel. */
+  .consent-check {
+    flex: 1 1 100%; display: flex; gap: 8px; align-items: flex-start;
+    font-size: 12px; line-height: 1.45; color: var(--ink-dim); text-align: left; cursor: pointer;
+  }
+  .consent-check input { margin: 2px 0 0; accent-color: var(--ember); flex: none; }
+
   .first-choice-hint {
     font-size: 13px; color: var(--ember); margin: 0 0 18px;
     padding-bottom: 14px; border-bottom: 1px solid var(--border);

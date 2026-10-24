@@ -1,6 +1,12 @@
 import { AuthGate } from './AuthGate.jsx';
+import { useAuth } from '../engine/useAuth.js';
+import { useEmailConsent } from '../engine/useEmailConsent.js';
+import { CONSENT_WORDING } from '../engine/emailConsent.js';
 
 export function AccountModal({ isAnonymous, userEmail, onClose }) {
+  const { user } = useAuth();
+  const consent = useEmailConsent(user);
+
   return (
     <div
       style={{
@@ -29,6 +35,17 @@ export function AccountModal({ isAnonymous, userEmail, onClose }) {
               progress and purchases follow this account on any device you
               sign in on.
             </p>
+            {consent.optedIn !== null && (
+              <label className="consent-check" style={{ marginTop: 14 }}>
+                <input
+                  type="checkbox"
+                  checked={consent.optedIn}
+                  disabled={consent.saving}
+                  onChange={(e) => consent.setOptedIn(e.target.checked)}
+                />
+                <span>{CONSENT_WORDING}</span>
+              </label>
+            )}
           </div>
         ) : (
           <AuthGate

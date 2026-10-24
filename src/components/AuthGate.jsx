@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEmailAuth } from '../engine/useEmailAuth.js';
 import { supabase } from '../data/supabaseClient.js';
 import { stripAutoPurchaseParam } from '../engine/purchaseRedirect.js';
+import { CONSENT_WORDING, savePendingConsent } from '../engine/emailConsent.js';
 
 // crossDevice is optional — only Paywall/BundlePromo pass it, since only
 // they know the titleId/bundle context a purchase check needs. When
@@ -11,6 +12,8 @@ import { stripAutoPurchaseParam } from '../engine/purchaseRedirect.js';
 // cannot: see that hook's header comment for why.
 export function AuthGate({ heading, description, redirectPath, compact, crossDevice, onLinkSent }) {
   const [email, setEmail] = useState('');
+  // Unticked by default: marketing consent has to be actively given.
+  const [wantsEmails, setWantsEmails] = useState(false);
   const { status, error, mode, sendAuthLink } = useEmailAuth();
   const pollCountRef = useRef(0);
   const [resendState, setResendState] = useState('idle'); // idle | sending | sent | error
@@ -136,8 +139,13 @@ export function AuthGate({ heading, description, redirectPath, compact, crossDev
         </p>
       )}
       <form
-        onSubmit={(e) => { e.preventDefault(); sendAuthLink(email, redirectPath); }}
-        style={{ display: 'flex', gap: 8, flexWrap: compact ? 'nowrap' : 'wrap' }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          // Recorded only once they're signed in as this email (useEmailConsent).
+          if (wantsEmails) savePendingConsent(window.localStorage, email);
+          sendAuthLink(email, redirectPath);
+        }}
+        style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
       >
         <input
           type="email"
@@ -161,6 +169,10 @@ export function AuthGate({ heading, description, redirectPath, compact, crossDev
         >
           {status === 'sending' ? 'Sending…' : 'Continue'}
         </button>
+        <label className="consent-check">
+          <input type="checkbox" checked={wantsEmails} onChange={(e) => setWantsEmails(e.target.checked)} />
+          <span>{CONSENT_WORDING}</span>
+        </label>
       </form>
       {status === 'error' && (
         <p style={{ fontSize: 12, color: 'var(--ember)', marginTop: 10 }}>{error}</p>

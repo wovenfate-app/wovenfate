@@ -25,6 +25,7 @@ import { LandingPage, SiteFooter } from './components/LandingPage.jsx';
 import { TitleCoverPage } from './components/TitleCoverPage.jsx';
 import { AppHeader } from './components/AppHeader.jsx';
 import { AccountModal } from './components/AccountModal.jsx';
+import { useEmailConsent } from './engine/useEmailConsent.js';
 import { visitPayload } from './engine/analyticsEvents.js';
 import { isFreeTitle, nextTitleSuggestions } from './engine/pricing.js';
 import { endingQuote } from './engine/shareEnding.js';
@@ -39,6 +40,9 @@ const LANDING = { href: window.location.href, referrer: document.referrer };
 export default function App() {
   const { user, loading: authLoading, isAnonymous } = useAuth();
   const { track } = useAnalytics(user?.id);
+  // Records an "email me about new books" opt-in ticked while saving the
+  // account, as soon as the reader is signed in as that email.
+  useEmailConsent(user);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
 
   // One site_visited event per browser session, recording where the
