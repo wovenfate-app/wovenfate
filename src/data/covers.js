@@ -10,4 +10,5 @@ export const COVER_IMAGES = {
   'salt-and-drowning': '/covers/salt-and-drowning.jpg',
   'wardens-heir': '/covers/wardens-heir.jpg',
   'ashbound': '/covers/ashbound.jpg',
+  'hollow-house': '/covers/hollow-house.jpg',
 };

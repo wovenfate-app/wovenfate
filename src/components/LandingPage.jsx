@@ -5,17 +5,24 @@ import { SocialLinks } from './SocialLinks.jsx';
 import { isFreeTitle } from '../engine/pricing.js';
 import { COMING_SOON } from '../data/comingSoon.js';
 
-// A book announced ahead of release: cover, date and blurb, nothing to
-// click. It disappears once the book itself is in the catalogue.
-function ComingSoonCard({ book }) {
+// A book around its release: before launch, cover, date and blurb with
+// nothing to click; once it's live (and until featureUntil), "Out now"
+// with a button straight into the book.
+function ComingSoonCard({ book, live, onSelect }) {
+  const label = live ? book.outNowLabel : book.releaseLabel;
   return (
-    <article className="coming-soon" aria-label={`${book.name}, ${book.releaseLabel}`}>
+    <article className="coming-soon" aria-label={`${book.name}, ${label}`}>
       <img src={book.cover} alt="" width="120" height="180" loading="lazy" decoding="async" />
       <div className="coming-soon-text">
-        <span className="coming-soon-kicker">{book.releaseLabel} · {book.genre}</span>
+        <span className="coming-soon-kicker">{label} · {book.genre}</span>
         <h3>{book.name}</h3>
         <p>{book.blurb}</p>
         <p className="coming-soon-hook">{book.hook}</p>
+        {live && (
+          <button className="btn-primary coming-soon-cta" onClick={() => onSelect(book.id)}>
+            Start reading free
+          </button>
+        )}
       </div>
     </article>
   );
@@ -50,6 +57,7 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
   const freeTitle = titles.find(isFreeTitle);
   const liveIds = new Set(titles.map((t) => t.id));
   const comingSoon = COMING_SOON.filter((b) => !liveIds.has(b.id));
+  const outNow = COMING_SOON.filter((b) => liveIds.has(b.id) && b.featureUntil && Date.now() < Date.parse(b.featureUntil));
 
   // Dedicated wide banner spanning all titles' motifs — deliberately
   // NOT a reused title cover, which left dead space when stretched
@@ -76,6 +84,13 @@ export function LandingPage({ titles, inProgressIds, purchasedIds, onSelect }) {
           the catalog rows. */}
 
       <InstallBanner />
+
+      {outNow.length > 0 && (
+        <div className="catalog-section">
+          <h2 className="catalog-section-title">New this Halloween</h2>
+          {outNow.map((book) => <ComingSoonCard key={book.id} book={book} live onSelect={onSelect} />)}
+        </div>
+      )}
 
       {inProgress.length > 0 && (
         <div className="catalog-section">

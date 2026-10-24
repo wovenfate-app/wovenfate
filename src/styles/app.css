@@ -417,6 +417,7 @@
   .coming-soon h3 { font-family: 'Fraunces', serif; font-size: 19px; line-height: 1.2; margin: 0; }
   .coming-soon p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-dim); }
   .coming-soon .coming-soon-hook { color: var(--ink); font-style: italic; }
+  .coming-soon .coming-soon-cta { margin-top: 6px; padding: 11px 16px; font-size: 14px; }
   @media (max-width: 380px) {
     .coming-soon { grid-template-columns: 90px 1fr; }
     .coming-soon img { width: 90px; height: 135px; }

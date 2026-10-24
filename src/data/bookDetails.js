@@ -46,6 +46,15 @@ export const BOOK_DETAILS = {
     tropes: ['Arranged marriage', 'Rival houses', 'Dragon-shifter', 'Banter'],
     contentNotes: ['War', 'Loss of a sibling (referenced)'],
   },
+  'hollow-house': {
+    // 22 scenes, 8–9 chapters depending on route, 7 endings (check-story:
+    // 5,023–5,774 words a read-through).
+    readMinutes: '22–25',
+    chapters: 9,
+    endings: 7,
+    tropes: ['Haunted inheritance', 'Ghost lover', 'Love triangle', 'Gothic slow burn'],
+    contentNotes: ['Death and ghosts', 'A historical murder', 'Peril to a child', 'Fire', 'Some endings where you die'],
+  },
 };
 
 // Shared across every title: romantic scenes fade to black.

@@ -38,4 +38,11 @@ export const TITLES = [
     tagline: 'An arranged marriage is the only thing standing between two warring dragon-shifter houses and the war that started it all reigniting.',
     price_cents: 299,
   },
+  {
+    // The Halloween title, released 24 October 2026.
+    id: 'hollow-house',
+    name: 'The Hollow House',
+    tagline: 'You inherit a manor on the moors, three rules, and a ghost who has waited a hundred and thirty years for someone to open the door.',
+    price_cents: 299,
+  },
 ];

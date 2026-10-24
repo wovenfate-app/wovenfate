@@ -11,6 +11,7 @@ import { bindingOath } from '../src/data/stories/binding-oath.js';
 import { saltAndDrowning } from '../src/data/stories/salt-and-drowning.js';
 import { wardensHeir } from '../src/data/stories/wardens-heir.js';
 import { ashbound } from '../src/data/stories/ashbound.js';
+import { hollowHouse } from '../src/data/stories/hollow-house.js';
 import { TITLES } from '../src/data/titles.js';
 
 dotenv.config({ path: '.env.local' });
@@ -32,6 +33,7 @@ const STORIES = {
   'salt-and-drowning': saltAndDrowning,
   'wardens-heir': wardensHeir,
   ashbound,
+  'hollow-house': hollowHouse,
 };
 const titles = TITLES.map((t) => {
   if (!STORIES[t.id]) throw new Error(`No story imported for ${t.id}`);
