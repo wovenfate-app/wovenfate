@@ -76,6 +76,14 @@ test('visitPayload prefers utm tags from a campaign link', () => {
   assert.equal(p.landing_path, '/book/ember-court');
 });
 
+test('visitPayload records which ad was clicked (utm_content)', () => {
+  const p = visitPayload('https://www.wovenfate.app/book/ember-court?utm_source=meta&utm_campaign=test&utm_content=ad2', '');
+  assert.equal(p.source, 'meta');
+  assert.equal(p.campaign, 'test');
+  assert.equal(p.content, 'ad2');
+  assert.equal(visitPayload('https://wovenfate.app/?utm_source=meta', '').content, undefined);
+});
+
 test('visitPayload falls back to the referring host, then direct', () => {
   assert.equal(visitPayload('https://wovenfate.app/', 'https://l.instagram.com/?u=x').source, 'l.instagram.com');
   assert.equal(visitPayload('https://wovenfate.app/', '').source, 'direct');

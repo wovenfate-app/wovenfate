@@ -101,6 +101,9 @@ export function visitPayload(href, referrer = '') {
     source: (params.get('utm_source') || referrerHost || 'direct').toLowerCase(),
     medium: params.get('utm_medium') || undefined,
     campaign: params.get('utm_campaign') || undefined,
+    // Which ad or post in the campaign (e.g. utm_content=ad2), so ads
+    // running side by side can be compared on readers, not just clicks.
+    content: params.get('utm_content') || undefined,
     referrer_host: referrerHost || undefined,
     landing_path: url.pathname,
   };

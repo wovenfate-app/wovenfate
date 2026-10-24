@@ -40,7 +40,7 @@ const sourceOf = new Map();
 for (const e of events) {
   if (e.event_type === 'site_visited' && e.user_id && !sourceOf.has(e.user_id)) {
     const p = e.payload || {};
-    sourceOf.set(e.user_id, p.campaign ? `${p.source} / ${p.campaign}` : p.source || 'direct');
+    sourceOf.set(e.user_id, [p.source || 'direct', p.campaign, p.content].filter(Boolean).join(' / '));
   }
 }
 const src = (userId) => sourceOf.get(userId) || 'unknown';
