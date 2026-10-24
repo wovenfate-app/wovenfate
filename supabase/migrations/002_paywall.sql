@@ -1,4 +1,4 @@
--- Run this in Supabase SQL Editor — adds what schema.sql didn't have yet
+-- Run this in Supabase SQL Editor — adds what 001_initial_schema.sql didn't have yet
 -- when you first ran it (paywall support).
 
 alter table nodes add column if not exists is_locked boolean default false;

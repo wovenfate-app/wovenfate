@@ -1,5 +1,7 @@
--- Wovenfate — initial schema
--- Run this in the Supabase SQL editor (Project → SQL Editor → New query).
+-- Wovenfate — initial schema (migration 001; was supabase/schema.sql)
+-- Run this first, then the later migrations in number order. Checked
+-- against the live database on 24 Oct 2026: it matches. Table access
+-- for the website (grants) is set in 007_explicit_grants.sql.
 
 -- ─── Titles ──────────────────────────────────────────────────────────
 -- One row per story. Matches the { name, description } shape you'd show

@@ -68,7 +68,11 @@ Then open the local URL Vite prints (usually http://localhost:5173).
 ### Supabase setup
 
 1. Create a project at supabase.com (free tier).
-2. Project → SQL Editor → paste and run `supabase/schema.sql`.
+2. Project → SQL Editor → run every file in `supabase/migrations/` in
+   number order (`001_initial_schema.sql` first). `007_explicit_grants.sql`
+   gives the website its access to the tables; since 30 October 2026
+   Supabase no longer grants that automatically, so any new table needs
+   its own grants in the migration that creates it.
 3. Project Settings → API → copy the Project URL and `anon` public key.
 4. Copy `.env.example` to `.env.local` and fill in `VITE_SUPABASE_URL` /
    `VITE_SUPABASE_ANON_KEY`. Also grab the `service_role` key (same page)
